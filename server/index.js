@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
+const fs = require('fs');
 const { store } = require('./recoveryEngine');
 
 const app = express();
@@ -78,6 +80,15 @@ app.post('/api/reset', (req, res) => {
     stats
   });
 });
+
+// Serve frontend static files if client/dist exists (Combined All-in-One Server)
+const clientDistPath = path.join(__dirname, '../client/dist');
+if (fs.existsSync(clientDistPath)) {
+  app.use(express.static(clientDistPath));
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(clientDistPath, 'index.html'));
+  });
+}
 
 app.listen(PORT, () => {
   console.log(`Recover AI Server running on http://localhost:${PORT}`);
