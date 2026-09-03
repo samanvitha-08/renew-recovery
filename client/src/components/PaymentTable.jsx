@@ -13,7 +13,6 @@ import {
   HelpCircle,
   Search,
   Filter,
-  ArrowRight,
   Sparkles,
   Info
 } from 'lucide-react';
@@ -22,22 +21,22 @@ const REASON_CONFIG = {
   expired_card: {
     label: 'Expired Card',
     icon: CreditCard,
-    class: 'bg-amber-500/10 text-amber-400 border-amber-500/30'
+    class: 'bg-dustypink-100 text-dustypink-800 border-dustypink-300'
   },
   insufficient_funds: {
     label: 'Insufficient Funds',
     icon: Wallet,
-    class: 'bg-blue-500/10 text-blue-400 border-blue-500/30'
+    class: 'bg-sand-200 text-sand-900 border-sand-300'
   },
   bank_decline: {
     label: 'Bank Decline',
     icon: Building2,
-    class: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30'
+    class: 'bg-burgundy-100 text-burgundy-800 border-burgundy-200'
   },
   fraud_flag: {
     label: 'Fraud Flag',
     icon: ShieldAlert,
-    class: 'bg-rose-500/10 text-rose-400 border-rose-500/30'
+    class: 'bg-burgundy-200 text-burgundy-950 border-burgundy-300'
   }
 };
 
@@ -45,44 +44,44 @@ const ACTION_CONFIG = {
   send_email: {
     label: 'Send Email',
     icon: Mail,
-    badgeClass: 'bg-amber-500/10 text-amber-300 border-amber-500/20'
+    badgeClass: 'bg-dustypink-50 text-dustypink-800 border-dustypink-300/80'
   },
   retry_later: {
     label: 'Retry in 3 Days',
     icon: Clock,
-    badgeClass: 'bg-blue-500/10 text-blue-300 border-blue-500/20'
+    badgeClass: 'bg-sand-100 text-sand-900 border-sand-300/80'
   },
   retry_now: {
     label: 'Retry Now',
     icon: Zap,
-    badgeClass: 'bg-indigo-500/10 text-indigo-300 border-indigo-500/20'
+    badgeClass: 'bg-burgundy-50 text-burgundy-800 border-burgundy-200'
   },
   escalate_human: {
     label: 'Escalate to Human',
     icon: UserX,
-    badgeClass: 'bg-rose-500/10 text-rose-300 border-rose-500/20'
+    badgeClass: 'bg-burgundy-100 text-burgundy-950 border-burgundy-300'
   }
 };
 
 const STATUS_CONFIG = {
   failed: {
     label: 'Failed',
-    badgeClass: 'bg-rose-500/15 text-rose-300 border-rose-500/30',
+    badgeClass: 'bg-dustypink-100 text-dustypink-800 border-dustypink-300',
     icon: AlertCircle
   },
   recovered: {
     label: 'Recovered',
-    badgeClass: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+    badgeClass: 'bg-burgundy-800 text-creme-50 border-burgundy-900 shadow-2xs',
     icon: CheckCircle2
   },
   pending: {
     label: 'Pending Retry (3d)',
-    badgeClass: 'bg-blue-500/15 text-blue-300 border-blue-500/30',
+    badgeClass: 'bg-sand-200 text-sand-900 border-sand-300',
     icon: Clock
   },
   escalated: {
     label: 'Escalated to Ops',
-    badgeClass: 'bg-purple-500/15 text-purple-300 border-purple-500/30',
+    badgeClass: 'bg-burgundy-900 text-dustypink-200 border-burgundy-950',
     icon: ShieldAlert
   }
 };
@@ -94,9 +93,7 @@ export default function PaymentTable({
   selectedReason,
   onSelectReason,
   searchQuery,
-  onSearchChange,
-  statusFilter,
-  onStatusFilterChange
+  onSearchChange
 }) {
   const [activeTab, setActiveTab] = useState('all');
 
@@ -130,15 +127,16 @@ export default function PaymentTable({
   };
 
   return (
-    <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl overflow-hidden shadow-xl">
+    <div className="glass-panel-elevated rounded-3xl overflow-hidden shadow-soft-lg border border-sand-200/80 transition-all">
+      
       {/* Table Header & Controls */}
-      <div className="p-5 border-b border-slate-800 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div className="p-6 border-b border-sand-200/80 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 bg-creme-50/70">
         
         {/* Status Filter Tabs */}
-        <div className="flex items-center space-x-1.5 overflow-x-auto pb-2 lg:pb-0">
+        <div className="flex items-center space-x-2 overflow-x-auto pb-2 lg:pb-0">
           {[
             { id: 'all', label: 'All Payments' },
-            { id: 'failed', label: 'Failed (Action Needed)' },
+            { id: 'failed', label: 'Failed' },
             { id: 'recovered', label: 'Recovered' },
             { id: 'pending', label: 'Pending Retry' },
             { id: 'escalated', label: 'Escalated' }
@@ -149,15 +147,15 @@ export default function PaymentTable({
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-200 flex items-center gap-2 ${
                   isActive
-                    ? 'bg-brand-600 text-white shadow-sm shadow-brand-500/20'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                    ? 'bg-burgundy-800 text-creme-50 shadow-sm shadow-burgundy-900/20'
+                    : 'text-sand-800 hover:text-burgundy-900 hover:bg-sand-200/60'
                 }`}
               >
                 {tab.label}
-                <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
-                  isActive ? 'bg-black/20 text-white' : 'bg-slate-800 text-slate-400'
+                <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-bold ${
+                  isActive ? 'bg-dustypink-300 text-burgundy-950' : 'bg-sand-200 text-sand-800'
                 }`}>
                   {count}
                 </span>
@@ -169,22 +167,22 @@ export default function PaymentTable({
         {/* Search & Reason Filter */}
         <div className="flex items-center space-x-3">
           <div className="relative flex-1 sm:w-64">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-sand-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Search customer, ID, reason..."
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="w-full bg-slate-950/60 border border-slate-800 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-colors"
+              className="w-full bg-white/80 border border-sand-300/80 rounded-xl pl-9 pr-3.5 py-2 text-xs text-burgundy-950 placeholder-sand-500 focus:outline-none focus:border-burgundy-600 focus:ring-2 focus:ring-burgundy-600/10 transition-all font-medium"
             />
           </div>
 
           <div className="flex items-center space-x-1.5">
-            <Filter className="w-3.5 h-3.5 text-slate-400" />
+            <Filter className="w-4 h-4 text-sand-500" />
             <select
               value={selectedReason}
               onChange={(e) => onSelectReason(e.target.value)}
-              className="bg-slate-950/60 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-brand-500 cursor-pointer"
+              className="bg-white/80 border border-sand-300/80 rounded-xl px-3 py-2 text-xs text-burgundy-950 font-semibold focus:outline-none focus:border-burgundy-600 cursor-pointer shadow-2xs"
             >
               <option value="all">All Failure Causes</option>
               <option value="expired_card">Expired Card</option>
@@ -201,25 +199,25 @@ export default function PaymentTable({
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="border-b border-slate-800 bg-slate-950/40 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-              <th className="py-3 px-4">Customer</th>
-              <th className="py-3 px-4">Amount</th>
-              <th className="py-3 px-4">Customer History</th>
-              <th className="py-3 px-4">Failure Reason</th>
-              <th className="py-3 px-4">AI Chosen Action</th>
-              <th className="py-3 px-4 min-w-[240px]">AI Reasoning</th>
-              <th className="py-3 px-4">Status</th>
-              <th className="py-3 px-4 text-right">Actions</th>
+            <tr className="border-b border-sand-200/80 bg-sand-100/60 text-[11px] font-bold uppercase tracking-wider text-sand-800">
+              <th className="py-3.5 px-5">Customer</th>
+              <th className="py-3.5 px-5">Amount</th>
+              <th className="py-3.5 px-5">History</th>
+              <th className="py-3.5 px-5">Failure Reason</th>
+              <th className="py-3.5 px-5">AI Strategy</th>
+              <th className="py-3.5 px-5 min-w-[240px]">Autonomous Rationale</th>
+              <th className="py-3.5 px-5">Status</th>
+              <th className="py-3.5 px-5 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800/60 text-xs">
+          <tbody className="divide-y divide-sand-200/60 text-xs bg-white/40">
             {filteredPayments.length === 0 ? (
               <tr>
-                <td colSpan="8" className="py-12 text-center text-slate-500">
-                  <div className="flex flex-col items-center justify-center space-y-2">
-                    <HelpCircle className="w-8 h-8 text-slate-600" />
-                    <p className="text-sm font-medium">No payments match the filter criteria</p>
-                    <p className="text-xs text-slate-600">Try adjusting your search query or filters</p>
+                <td colSpan="8" className="py-14 text-center text-sand-600">
+                  <div className="flex flex-col items-center justify-center space-y-2.5">
+                    <HelpCircle className="w-9 h-9 text-sand-400" />
+                    <p className="text-sm font-bold text-burgundy-900 font-serif-luxury">No payments match the filter criteria</p>
+                    <p className="text-xs text-sand-600">Try adjusting your search query or selected cause</p>
                   </div>
                 </td>
               </tr>
@@ -236,90 +234,90 @@ export default function PaymentTable({
                 return (
                   <tr 
                     key={payment.id} 
-                    className="hover:bg-slate-800/30 transition-colors group cursor-pointer"
+                    className="hover:bg-creme-200/40 transition-colors group cursor-pointer"
                     onClick={() => onSelectPayment(payment)}
                   >
                     {/* Customer */}
-                    <td className="py-3.5 px-4">
-                      <div className="font-medium text-slate-100 group-hover:text-brand-300 transition-colors">
+                    <td className="py-4 px-5">
+                      <div className="font-bold text-burgundy-950 group-hover:text-burgundy-700 transition-colors">
                         {payment.customer_name}
                       </div>
-                      <div className="text-[11px] text-slate-400 font-mono">
+                      <div className="text-[11px] text-sand-700 font-mono">
                         {payment.customer_email || payment.id}
                       </div>
                       {payment.plan_name && (
-                        <span className="text-[10px] text-slate-500 font-sans">
+                        <span className="text-[10px] text-sand-600 font-medium">
                           {payment.plan_name}
                         </span>
                       )}
                     </td>
 
                     {/* Amount */}
-                    <td className="py-3.5 px-4 font-mono font-semibold text-white">
+                    <td className="py-4 px-5 font-mono font-bold text-burgundy-950 text-sm">
                       ${payment.amount?.toFixed(2)}
-                      <span className="text-[10px] text-slate-500 ml-1 font-normal font-sans">USD</span>
+                      <span className="text-[10px] text-sand-600 ml-1 font-normal font-sans">USD</span>
                     </td>
 
                     {/* Customer History */}
-                    <td className="py-3.5 px-4">
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-mono ${
-                        historyCount >= 15 ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20' :
-                        historyCount >= 5 ? 'bg-brand-500/10 text-brand-300 border border-brand-500/20' :
-                        historyCount > 0 ? 'bg-slate-800 text-slate-300 border border-slate-700' :
-                        'bg-rose-500/10 text-rose-300 border border-rose-500/20'
+                    <td className="py-4 px-5">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-mono font-semibold ${
+                        historyCount >= 15 ? 'bg-burgundy-100 text-burgundy-800 border border-burgundy-300' :
+                        historyCount >= 5 ? 'bg-dustypink-100 text-dustypink-800 border border-dustypink-300' :
+                        historyCount > 0 ? 'bg-sand-100 text-sand-800 border border-sand-300' :
+                        'bg-sand-200 text-sand-700 border border-sand-300'
                       }`}>
-                        {historyCount} {historyCount === 1 ? 'payment' : 'payments'}
-                        {historyCount >= 20 && ' (VIP)'}
+                        {historyCount} {historyCount === 1 ? 'pmt' : 'pmts'}
+                        {historyCount >= 20 && ' ★'}
                       </span>
                     </td>
 
                     {/* Failure Reason */}
-                    <td className="py-3.5 px-4">
-                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border ${reasonMeta.class}`}>
+                    <td className="py-4 px-5">
+                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold border ${reasonMeta.class}`}>
                         <ReasonIcon className="w-3.5 h-3.5" />
                         {reasonMeta.label}
                       </span>
                     </td>
 
                     {/* AI Chosen Action */}
-                    <td className="py-3.5 px-4">
-                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border ${actionMeta.badgeClass}`}>
+                    <td className="py-4 px-5">
+                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold border ${actionMeta.badgeClass}`}>
                         <ActionIcon className="w-3.5 h-3.5" />
                         {actionMeta.label}
                       </span>
                     </td>
 
                     {/* AI Reasoning */}
-                    <td className="py-3.5 px-4 text-xs text-slate-300 max-w-xs">
-                      <div className="line-clamp-2 text-[11px] leading-relaxed text-slate-300/90 font-sans">
+                    <td className="py-4 px-5 text-xs text-sand-900 max-w-xs">
+                      <div className="line-clamp-2 text-[11px] leading-relaxed text-sand-800 font-medium">
                         {payment.reasoning}
                       </div>
                     </td>
 
                     {/* Status */}
-                    <td className="py-3.5 px-4">
-                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium border ${statusMeta.badgeClass}`}>
+                    <td className="py-4 px-5">
+                      <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold border ${statusMeta.badgeClass}`}>
                         <StatusIcon className="w-3 h-3" />
                         {statusMeta.label}
                       </span>
                     </td>
 
                     {/* Actions */}
-                    <td className="py-3.5 px-4 text-right" onClick={(e) => e.stopPropagation()}>
+                    <td className="py-4 px-5 text-right" onClick={(e) => e.stopPropagation()}>
                       {payment.status === 'failed' ? (
                         <button
                           onClick={() => onExecuteAction(payment.id)}
-                          className="inline-flex items-center gap-1 px-3 py-1 text-xs font-medium rounded-lg text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 transition-all shadow-sm"
+                          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-xl text-creme-50 bg-gradient-to-r from-burgundy-800 to-burgundy-600 hover:from-burgundy-900 hover:to-burgundy-700 shadow-sm shadow-burgundy-900/20 hover:shadow transition-all active:scale-95"
                         >
-                          <Sparkles className="w-3 h-3" />
+                          <Sparkles className="w-3 h-3 text-dustypink-300" />
                           Execute
                         </button>
                       ) : (
                         <button
                           onClick={() => onSelectPayment(payment)}
-                          className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors"
+                          className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-xl text-sand-800 hover:text-burgundy-900 bg-sand-100 hover:bg-sand-200 border border-sand-300/80 transition-all shadow-2xs"
                         >
-                          <Info className="w-3.5 h-3.5" />
+                          <Info className="w-3.5 h-3.5 text-sand-600" />
                           Details
                         </button>
                       )}
@@ -332,12 +330,12 @@ export default function PaymentTable({
         </table>
       </div>
 
-      {/* Table Footer Summary */}
-      <div className="p-4 bg-slate-950/40 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+      {/* Table Footer */}
+      <div className="p-4 bg-sand-100/50 border-t border-sand-200/80 flex items-center justify-between text-xs text-sand-700 font-medium">
         <div>
-          Showing <span className="text-white font-medium">{filteredPayments.length}</span> of <span className="text-white font-medium">{payments.length}</span> payment records
+          Showing <span className="text-burgundy-950 font-bold">{filteredPayments.length}</span> of <span className="text-burgundy-950 font-bold">{payments.length}</span> payment records
         </div>
-        <div className="font-mono text-slate-400">
+        <div className="font-mono text-sand-800">
           Auto-evaluating with autonomous recovery rules
         </div>
       </div>

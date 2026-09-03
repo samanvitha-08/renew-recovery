@@ -8,7 +8,8 @@ import {
   Clock, 
   Zap, 
   UserX,
-  PieChart as ChartIcon
+  PieChart as ChartIcon,
+  Sparkles
 } from 'lucide-react';
 
 const REASON_METADATA = {
@@ -19,20 +20,20 @@ const REASON_METADATA = {
     action: 'send_email',
     actionLabel: 'Send Email Link',
     actionIcon: Mail,
-    color: 'amber',
-    badgeClass: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-    barColor: 'bg-gradient-to-r from-amber-500 to-amber-400',
+    badgeClass: 'bg-dustypink-100 text-dustypink-700 border-dustypink-300',
+    barColor: 'bg-gradient-to-r from-dustypink-300 via-dustypink-400 to-dustypink-500',
+    accentBorder: 'hover:border-dustypink-400',
   },
   insufficient_funds: {
     label: 'Insufficient Funds',
-    description: 'Declined due to low balance',
+    description: 'Declined due to temporary balance',
     icon: Wallet,
     action: 'retry_later',
     actionLabel: 'Smart Retry in 3d',
     actionIcon: Clock,
-    color: 'blue',
-    badgeClass: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-    barColor: 'bg-gradient-to-r from-blue-500 to-cyan-400',
+    badgeClass: 'bg-sand-100 text-sand-800 border-sand-300',
+    barColor: 'bg-gradient-to-r from-sand-300 via-sand-400 to-sand-500',
+    accentBorder: 'hover:border-sand-400',
   },
   bank_decline: {
     label: 'Bank Decline',
@@ -41,9 +42,9 @@ const REASON_METADATA = {
     action: 'retry_now',
     actionLabel: 'Instant Gateway Retry',
     actionIcon: Zap,
-    color: 'indigo',
-    badgeClass: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20',
-    barColor: 'bg-gradient-to-r from-indigo-500 to-purple-400',
+    badgeClass: 'bg-burgundy-50 text-burgundy-700 border-burgundy-200',
+    barColor: 'bg-gradient-to-r from-burgundy-400 via-burgundy-500 to-burgundy-600',
+    accentBorder: 'hover:border-burgundy-400',
   },
   fraud_flag: {
     label: 'Fraud Flag',
@@ -52,44 +53,45 @@ const REASON_METADATA = {
     action: 'escalate_human',
     actionLabel: 'Escalate to Compliance',
     actionIcon: UserX,
-    color: 'rose',
-    badgeClass: 'bg-rose-500/10 text-rose-400 border-rose-500/20',
-    barColor: 'bg-gradient-to-r from-rose-500 to-pink-500',
+    badgeClass: 'bg-burgundy-100 text-burgundy-900 border-burgundy-300',
+    barColor: 'bg-gradient-to-r from-burgundy-600 via-burgundy-800 to-burgundy-950',
+    accentBorder: 'hover:border-burgundy-600',
   }
 };
 
 export default function FailureChart({ stats, selectedReason, onSelectReason }) {
   const breakdown = stats?.breakdownByReason || {};
   const totalCount = stats?.totalCount || 30;
-  const totalAtRisk = stats?.totalAtRisk || 1;
 
   const reasons = ['expired_card', 'insufficient_funds', 'bank_decline', 'fraud_flag'];
 
   return (
-    <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-5 border-b border-slate-800 gap-2">
-        <div className="flex items-center space-x-2.5">
-          <div className="p-2 rounded-lg bg-brand-500/10 border border-brand-500/20 text-brand-400">
-            <ChartIcon className="w-4 h-4" />
+    <div className="glass-panel-elevated rounded-3xl p-6 sm:p-7 shadow-soft transition-all">
+      
+      {/* Header section */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-5 border-b border-sand-200/80 gap-3">
+        <div className="flex items-center space-x-3">
+          <div className="p-2.5 rounded-xl bg-dustypink-100 border border-dustypink-200 text-burgundy-700">
+            <ChartIcon className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-sm font-semibold text-white">Root-Cause Breakdown</h2>
-            <p className="text-xs text-slate-400">Distribution of payment failures & autonomous recovery policies</p>
+            <h2 className="text-base font-bold text-burgundy-950 font-serif-luxury tracking-tight">Root-Cause Breakdown</h2>
+            <p className="text-xs text-sand-700">Distribution of payment failures & autonomous recovery policies</p>
           </div>
         </div>
 
         {selectedReason !== 'all' && (
           <button
             onClick={() => onSelectReason('all')}
-            className="text-xs text-brand-400 hover:text-brand-300 underline font-medium self-start sm:self-auto"
+            className="text-xs text-burgundy-700 hover:text-burgundy-900 font-semibold underline self-start sm:self-auto transition-colors"
           >
             Clear filter ({REASON_METADATA[selectedReason]?.label})
           </button>
         )}
       </div>
 
-      {/* Breakdown List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
+      {/* Grid of Causes */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
         {reasons.map((key) => {
           const meta = REASON_METADATA[key];
           const data = breakdown[key] || { count: 0, amount: 0, recoveredCount: 0, recoveredAmount: 0 };
@@ -103,56 +105,56 @@ export default function FailureChart({ stats, selectedReason, onSelectReason }) 
             <div
               key={key}
               onClick={() => onSelectReason(isSelected ? 'all' : key)}
-              className={`group p-4 rounded-xl border transition-all cursor-pointer ${
+              className={`group p-5 rounded-2xl border transition-all duration-300 cursor-pointer shadow-sm hover:shadow-md ${
                 isSelected
-                  ? 'bg-slate-800/90 border-brand-500 shadow-md ring-1 ring-brand-500/30'
-                  : 'bg-slate-950/40 border-slate-800/80 hover:bg-slate-800/40 hover:border-slate-700'
+                  ? 'bg-gradient-to-br from-creme-50 to-dustypink-100/70 border-burgundy-600 ring-2 ring-burgundy-600/30 scale-[1.01]'
+                  : `bg-creme-50/90 border-sand-200/90 hover:bg-creme-50 hover:-translate-y-0.5 ${meta.accentBorder}`
               }`}
             >
               <div className="flex items-start justify-between">
-                <div className="flex items-center space-x-2.5">
-                  <div className={`p-2 rounded-lg ${meta.badgeClass} border`}>
+                <div className="flex items-center space-x-3">
+                  <div className={`p-2.5 rounded-xl ${meta.badgeClass} border transition-transform duration-300 group-hover:scale-105`}>
                     <ReasonIcon className="w-4 h-4" />
                   </div>
                   <div>
-                    <span className="text-sm font-semibold text-white group-hover:text-brand-300 transition-colors">
+                    <span className="text-sm font-bold text-burgundy-950 group-hover:text-burgundy-700 transition-colors">
                       {meta.label}
                     </span>
-                    <p className="text-[11px] text-slate-400">{meta.description}</p>
+                    <p className="text-[11px] text-sand-700">{meta.description}</p>
                   </div>
                 </div>
 
                 <div className="text-right">
-                  <div className="text-sm font-mono font-bold text-white">
-                    {count} <span className="text-xs font-normal text-slate-400">({percentage}%)</span>
+                  <div className="text-sm font-mono font-bold text-burgundy-950">
+                    {count} <span className="text-xs font-medium text-sand-600 font-sans">({percentage}%)</span>
                   </div>
-                  <div className="text-xs font-mono text-slate-400">
+                  <div className="text-xs font-mono font-semibold text-dustypink-700">
                     ${data.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                   </div>
                 </div>
               </div>
 
-              {/* Progress Bar */}
-              <div className="mt-3.5 space-y-1.5">
-                <div className="flex justify-between text-[11px] text-slate-400">
+              {/* Progress & Recovery Share */}
+              <div className="mt-4 space-y-1.5">
+                <div className="flex justify-between text-[11px] font-medium text-sand-700">
                   <span>Volume share</span>
-                  <span className="font-mono text-emerald-400">
+                  <span className="font-mono font-bold text-burgundy-800">
                     {data.recoveredCount > 0 ? `${data.recoveredCount} recovered ($${data.recoveredAmount.toFixed(0)})` : 'Pending recovery'}
                   </span>
                 </div>
-                <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden flex">
+                <div className="w-full bg-sand-200/80 h-2.5 rounded-full overflow-hidden flex">
                   <div
-                    className={`h-full ${meta.barColor} transition-all duration-500`}
+                    className={`h-full ${meta.barColor} transition-all duration-700 rounded-full`}
                     style={{ width: `${percentage}%` }}
                   />
                 </div>
               </div>
 
-              {/* Assigned AI Agent Action */}
-              <div className="mt-3 pt-2.5 border-t border-slate-800/80 flex items-center justify-between text-xs">
-                <span className="text-[11px] text-slate-400">AI Strategy:</span>
-                <span className="inline-flex items-center gap-1 font-mono text-[11px] font-medium text-slate-200 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">
-                  <ActionIcon className="w-3 h-3 text-brand-400" />
+              {/* Strategy Footer */}
+              <div className="mt-3.5 pt-3 border-t border-sand-200/60 flex items-center justify-between text-xs">
+                <span className="text-[11px] font-medium text-sand-700">AI Strategy:</span>
+                <span className="inline-flex items-center gap-1.5 font-mono text-[11px] font-bold text-burgundy-900 bg-sand-100/90 px-2.5 py-1 rounded-lg border border-sand-300/80 shadow-2xs">
+                  <ActionIcon className="w-3.5 h-3.5 text-burgundy-700" />
                   {meta.actionLabel}
                 </span>
               </div>

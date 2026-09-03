@@ -5,8 +5,7 @@ import {
   CheckCircle2, 
   Clock, 
   ShieldAlert, 
-  TrendingUp,
-  Percent
+  TrendingUp
 } from 'lucide-react';
 
 export default function MetricCard({ 
@@ -22,87 +21,82 @@ export default function MetricCard({
     switch (variant) {
       case 'danger':
         return {
-          border: 'border-rose-500/20 bg-rose-500/[0.03]',
-          iconBg: 'bg-rose-500/10 text-rose-400 border border-rose-500/20',
-          text: 'text-rose-400',
-          glow: 'from-rose-500/10 to-transparent'
+          container: 'bg-gradient-to-br from-creme-50 via-dustypink-50/50 to-sand-100/60 border-dustypink-300/60 hover:border-dustypink-400',
+          iconBg: 'bg-dustypink-100 text-burgundy-700 border border-dustypink-300',
+          valText: 'text-burgundy-950',
+          badge: 'bg-dustypink-100 text-burgundy-800 border-dustypink-300',
+          progressBg: 'bg-gradient-to-r from-dustypink-400 to-burgundy-600'
         };
       case 'success':
         return {
-          border: 'border-emerald-500/30 bg-emerald-500/[0.05]',
-          iconBg: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30',
-          text: 'text-emerald-400',
-          glow: 'from-emerald-500/15 to-transparent'
-        };
-      case 'warning':
-        return {
-          border: 'border-amber-500/20 bg-amber-500/[0.03]',
-          iconBg: 'bg-amber-500/10 text-amber-400 border border-amber-500/20',
-          text: 'text-amber-400',
-          glow: 'from-amber-500/10 to-transparent'
+          container: 'bg-gradient-to-br from-burgundy-900 via-burgundy-800 to-burgundy-950 border-burgundy-700/60 text-creme-50 shadow-soft-lg hover:shadow-glow-burgundy',
+          iconBg: 'bg-burgundy-700/60 text-dustypink-200 border border-burgundy-500/40',
+          valText: 'text-creme-50',
+          badge: 'bg-dustypink-300/20 text-dustypink-200 border-dustypink-400/30',
+          progressBg: 'bg-gradient-to-r from-dustypink-300 to-dustypink-100'
         };
       case 'brand':
         return {
-          border: 'border-brand-500/30 bg-brand-500/[0.05]',
-          iconBg: 'bg-brand-500/15 text-brand-400 border border-brand-500/30',
-          text: 'text-brand-300',
-          glow: 'from-brand-500/15 to-transparent'
+          container: 'bg-gradient-to-br from-creme-50 via-sand-100/50 to-creme-200/50 border-sand-300/80 hover:border-sand-400',
+          iconBg: 'bg-sand-200 text-burgundy-800 border border-sand-300',
+          valText: 'text-burgundy-900',
+          badge: 'bg-sand-200 text-burgundy-900 border-sand-300',
+          progressBg: 'bg-gradient-to-r from-sand-500 to-burgundy-700'
         };
       default:
         return {
-          border: 'border-slate-800 bg-slate-900/50',
-          iconBg: 'bg-slate-800 text-slate-300 border border-slate-700',
-          text: 'text-white',
-          glow: 'from-slate-700/10 to-transparent'
+          container: 'bg-gradient-to-br from-creme-50 via-sand-50 to-dustypink-50/30 border-sand-300/70 hover:border-dustypink-300',
+          iconBg: 'bg-sand-100 text-sand-800 border border-sand-300',
+          valText: 'text-burgundy-950',
+          badge: 'bg-sand-100 text-sand-800 border-sand-300',
+          progressBg: 'bg-burgundy-600'
         };
     }
   };
 
   const style = getStyles();
+  const isDarkCard = variant === 'success';
 
   return (
-    <div className={`relative overflow-hidden rounded-2xl border ${style.border} p-5 transition-all duration-300 hover:border-slate-700`}>
-      <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl ${style.glow} rounded-full blur-2xl pointer-events-none`} />
+    <div className={`relative overflow-hidden rounded-2xl border p-6 transition-all duration-300 hover:-translate-y-1 shadow-soft ${style.container} group`}>
       
+      {/* Top Row: Title and Icon */}
       <div className="flex items-center justify-between">
-        <span className="text-xs font-medium uppercase tracking-wider text-slate-400">
+        <span className={`text-[11px] font-bold uppercase tracking-wider ${isDarkCard ? 'text-dustypink-200' : 'text-sand-700'}`}>
           {title}
         </span>
-        <div className={`p-2.5 rounded-xl ${style.iconBg}`}>
+        <div className={`p-2.5 rounded-xl transition-transform duration-300 group-hover:scale-110 ${style.iconBg}`}>
           <Icon className="w-4 h-4" />
         </div>
       </div>
 
+      {/* Main Metric Value */}
       <div className="mt-4 flex items-baseline justify-between">
-        <div className="text-2xl sm:text-3xl font-bold font-mono tracking-tight text-white">
+        <div className={`text-2xl sm:text-3xl font-bold font-mono tracking-tight ${style.valText}`}>
           {value}
         </div>
         {badge && (
-          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium font-mono ${
-            variant === 'success' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' :
-            variant === 'danger' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' :
-            'bg-slate-800 text-slate-300 border border-slate-700'
-          }`}>
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold font-mono border ${style.badge}`}>
             {badge}
           </span>
         )}
       </div>
 
+      {/* Progress Bar (if provided) */}
       {progress !== undefined && (
-        <div className="mt-3">
-          <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+        <div className="mt-3.5">
+          <div className={`w-full h-2 rounded-full overflow-hidden ${isDarkCard ? 'bg-burgundy-950/60' : 'bg-sand-200/80'}`}>
             <div 
-              className={`h-full transition-all duration-700 rounded-full ${
-                variant === 'success' ? 'bg-gradient-to-r from-emerald-500 to-teal-400' : 'bg-brand-500'
-              }`}
+              className={`h-full transition-all duration-1000 rounded-full ${style.progressBg}`}
               style={{ width: `${Math.min(Math.max(progress, 0), 100)}%` }}
             />
           </div>
         </div>
       )}
 
+      {/* Subtitle */}
       {subtitle && (
-        <p className="mt-2 text-xs text-slate-400 flex items-center gap-1">
+        <p className={`mt-2.5 text-xs font-medium ${isDarkCard ? 'text-dustypink-200/80' : 'text-sand-700'}`}>
           {subtitle}
         </p>
       )}

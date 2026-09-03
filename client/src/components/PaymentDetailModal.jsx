@@ -7,14 +7,8 @@ import {
   Clock, 
   AlertTriangle, 
   ShieldAlert, 
-  Mail, 
-  Zap, 
-  UserX,
-  CreditCard,
   History,
-  FileCode,
-  Calendar,
-  DollarSign
+  FileCode
 } from 'lucide-react';
 
 export default function PaymentDetailModal({ payment, onClose, onExecuteAction }) {
@@ -23,94 +17,94 @@ export default function PaymentDetailModal({ payment, onClose, onExecuteAction }
   const isPending = payment.status === 'failed';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fadeIn">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-burgundy-950/60 backdrop-blur-sm animate-fadeIn">
       <div 
-        className="bg-slate-900 border border-slate-700/80 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl relative"
+        className="bg-creme-50 border border-sand-300 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl relative"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="p-6 border-b border-slate-800 flex items-start justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="p-2.5 rounded-xl bg-brand-500/10 border border-brand-500/20 text-brand-400">
-              <Bot className="w-5 h-5" />
+        <div className="p-6 sm:p-7 border-b border-sand-200 flex items-start justify-between bg-creme-100/80">
+          <div className="flex items-center space-x-3.5">
+            <div className="p-3 rounded-2xl bg-dustypink-100 border border-dustypink-200 text-burgundy-700 shadow-sm">
+              <Bot className="w-6 h-6" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-lg font-bold text-white">
+              <div className="flex items-center gap-2.5">
+                <h3 className="text-xl font-bold font-serif-luxury text-burgundy-950">
                   Payment #{payment.id}
                 </h3>
-                <span className="text-xs font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+                <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-sand-200 text-burgundy-900 border border-sand-300">
                   {payment.plan_name || 'Subscription Plan'}
                 </span>
               </div>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Customer: <span className="text-slate-200 font-medium">{payment.customer_name}</span> ({payment.customer_email})
+              <p className="text-xs text-sand-700 mt-1 font-medium">
+                Customer: <span className="text-burgundy-950 font-bold">{payment.customer_name}</span> ({payment.customer_email})
               </p>
             </div>
           </div>
 
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-2 rounded-xl text-sand-600 hover:text-burgundy-950 hover:bg-sand-200/80 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Modal Body */}
-        <div className="p-6 space-y-6">
+        <div className="p-6 sm:p-7 space-y-6">
           
-          {/* Key Metrics row */}
-          <div className="grid grid-cols-3 gap-3 p-3.5 bg-slate-950/60 rounded-xl border border-slate-800">
+          {/* Key Metrics Row */}
+          <div className="grid grid-cols-3 gap-3.5 p-4 bg-sand-100/60 rounded-2xl border border-sand-200">
             <div>
-              <span className="text-[11px] text-slate-400 uppercase tracking-wider">Amount</span>
-              <div className="text-lg font-bold font-mono text-white mt-0.5">
-                ${payment.amount?.toFixed(2)} <span className="text-xs font-normal text-slate-400">USD</span>
+              <span className="text-[11px] text-sand-700 font-bold uppercase tracking-wider">Amount</span>
+              <div className="text-xl font-bold font-mono text-burgundy-950 mt-0.5">
+                ${payment.amount?.toFixed(2)} <span className="text-xs font-normal text-sand-600">USD</span>
               </div>
             </div>
             <div>
-              <span className="text-[11px] text-slate-400 uppercase tracking-wider">Customer History</span>
-              <div className="text-sm font-semibold text-slate-200 mt-1 flex items-center gap-1">
-                <History className="w-3.5 h-3.5 text-brand-400" />
+              <span className="text-[11px] text-sand-700 font-bold uppercase tracking-wider">Customer Loyalty</span>
+              <div className="text-sm font-bold text-burgundy-900 mt-1 flex items-center gap-1.5 font-mono">
+                <History className="w-4 h-4 text-burgundy-700" />
                 {payment.past_successful_payments} past payments
               </div>
             </div>
             <div>
-              <span className="text-[11px] text-slate-400 uppercase tracking-wider">Current Status</span>
-              <div className="text-sm font-semibold mt-1">
-                {payment.status === 'recovered' && <span className="text-emerald-400 flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" /> Recovered</span>}
-                {payment.status === 'pending' && <span className="text-blue-400 flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> Retry Scheduled</span>}
-                {payment.status === 'escalated' && <span className="text-purple-400 flex items-center gap-1"><ShieldAlert className="w-3.5 h-3.5" /> Escalated</span>}
-                {payment.status === 'failed' && <span className="text-rose-400 flex items-center gap-1"><AlertTriangle className="w-3.5 h-3.5" /> Failed</span>}
+              <span className="text-[11px] text-sand-700 font-bold uppercase tracking-wider">Current Status</span>
+              <div className="text-sm font-bold mt-1">
+                {payment.status === 'recovered' && <span className="text-burgundy-800 flex items-center gap-1"><CheckCircle2 className="w-4 h-4 text-burgundy-700" /> Recovered</span>}
+                {payment.status === 'pending' && <span className="text-sand-800 flex items-center gap-1"><Clock className="w-4 h-4 text-sand-700" /> Retry Scheduled</span>}
+                {payment.status === 'escalated' && <span className="text-burgundy-950 flex items-center gap-1"><ShieldAlert className="w-4 h-4 text-burgundy-700" /> Escalated</span>}
+                {payment.status === 'failed' && <span className="text-dustypink-800 flex items-center gap-1"><AlertTriangle className="w-4 h-4 text-dustypink-600" /> Action Needed</span>}
               </div>
             </div>
           </div>
 
           {/* AI Decision & Reasoning Breakdown */}
           <div className="space-y-3">
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-brand-400" />
+            <h4 className="text-xs font-bold uppercase tracking-wider text-burgundy-900 flex items-center gap-1.5 font-serif-luxury text-sm">
+              <Sparkles className="w-4 h-4 text-burgundy-600" />
               Agentic AI Decision Trail
             </h4>
 
-            <div className="p-4 bg-slate-950/80 rounded-xl border border-slate-800 space-y-3">
+            <div className="p-5 bg-white/80 rounded-2xl border border-sand-200 space-y-3.5 shadow-2xs">
               <div className="flex items-center justify-between">
-                <span className="text-xs text-slate-400">Classified Root Cause:</span>
-                <span className="text-xs font-semibold text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 font-mono">
+                <span className="text-xs text-sand-700 font-medium">Classified Root Cause:</span>
+                <span className="text-xs font-bold text-dustypink-800 bg-dustypink-100 px-2.5 py-1 rounded-lg border border-dustypink-300 font-mono">
                   {payment.failure_reason}
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-xs text-slate-400">Decided Action:</span>
-                <span className="text-xs font-semibold text-brand-300 bg-brand-500/10 px-2 py-0.5 rounded border border-brand-500/20 font-mono">
+                <span className="text-xs text-sand-700 font-medium">Decided Action:</span>
+                <span className="text-xs font-bold text-burgundy-800 bg-burgundy-100 px-2.5 py-1 rounded-lg border border-burgundy-200 font-mono">
                   {payment.action}
                 </span>
               </div>
 
-              <div className="pt-2 border-t border-slate-800/80">
-                <span className="text-xs font-medium text-slate-300">Autonomous Reasoning:</span>
-                <p className="mt-1 text-xs text-slate-400 leading-relaxed bg-slate-900/90 p-3 rounded-lg border border-slate-800 text-slate-300">
+              <div className="pt-3 border-t border-sand-200">
+                <span className="text-xs font-bold text-burgundy-950">Autonomous Reasoning:</span>
+                <p className="mt-1.5 text-xs leading-relaxed bg-creme-100/90 p-3.5 rounded-xl border border-sand-200 text-burgundy-950 font-medium">
                   {payment.reasoning}
                 </p>
               </div>
@@ -119,17 +113,17 @@ export default function PaymentDetailModal({ payment, onClose, onExecuteAction }
 
           {/* Execution Payload / Message Simulation */}
           <div className="space-y-2">
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-              <FileCode className="w-3.5 h-3.5 text-brand-400" />
+            <h4 className="text-xs font-bold uppercase tracking-wider text-burgundy-900 flex items-center gap-1.5 font-serif-luxury text-sm">
+              <FileCode className="w-4 h-4 text-burgundy-600" />
               Simulated Execution Payload
             </h4>
 
-            <div className="p-3.5 bg-slate-950 rounded-xl border border-slate-800 font-mono text-xs text-slate-300 leading-relaxed overflow-x-auto">
-              <p className="text-slate-400">// Output generated by Recover Engine:</p>
-              <p className="mt-1 text-emerald-400">"{payment.message}"</p>
+            <div className="p-4 bg-burgundy-950 rounded-2xl border border-burgundy-800 font-mono text-xs text-creme-100 leading-relaxed overflow-x-auto shadow-inner">
+              <p className="text-dustypink-300 font-sans text-[11px] font-medium">// Output generated by Recover Engine:</p>
+              <p className="mt-1.5 text-dustypink-200 font-bold">"{payment.message}"</p>
               {payment.execution_log && (
-                <div className="mt-2 pt-2 border-t border-slate-800 text-slate-400">
-                  <span className="text-blue-400 font-bold">Audit Log:</span> {payment.execution_log}
+                <div className="mt-2.5 pt-2.5 border-t border-burgundy-800 text-sand-300">
+                  <span className="text-dustypink-300 font-bold">Audit Log:</span> {payment.execution_log}
                 </div>
               )}
             </div>
@@ -138,15 +132,15 @@ export default function PaymentDetailModal({ payment, onClose, onExecuteAction }
         </div>
 
         {/* Modal Footer */}
-        <div className="p-5 border-t border-slate-800 bg-slate-950/50 flex items-center justify-between">
-          <span className="text-xs text-slate-500 font-mono">
+        <div className="p-5 sm:p-6 border-t border-sand-200 bg-creme-100/70 flex items-center justify-between">
+          <span className="text-xs text-sand-700 font-mono font-medium">
             Date: {new Date(payment.date).toLocaleString()}
           </span>
 
-          <div className="flex items-center space-x-2.5">
+          <div className="flex items-center space-x-3">
             <button
               onClick={onClose}
-              className="px-4 py-2 text-xs font-medium rounded-lg text-slate-300 hover:bg-slate-800 transition-colors"
+              className="px-4 py-2 text-xs font-bold rounded-xl text-sand-800 hover:bg-sand-200 transition-colors"
             >
               Close
             </button>
@@ -156,9 +150,9 @@ export default function PaymentDetailModal({ payment, onClose, onExecuteAction }
                   onExecuteAction(payment.id);
                   onClose();
                 }}
-                className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-lg text-white bg-gradient-to-r from-brand-600 to-emerald-600 hover:from-brand-500 hover:to-emerald-500 shadow-lg shadow-emerald-950/40 transition-all"
+                className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl text-creme-50 bg-gradient-to-r from-burgundy-800 to-burgundy-600 hover:from-burgundy-900 hover:to-burgundy-700 shadow-md shadow-burgundy-900/20 transition-all active:scale-95"
               >
-                <Sparkles className="w-3.5 h-3.5" />
+                <Sparkles className="w-3.5 h-3.5 text-dustypink-300" />
                 Execute Autonomous Action
               </button>
             )}

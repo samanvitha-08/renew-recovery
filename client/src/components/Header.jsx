@@ -3,11 +3,10 @@ import {
   Bot, 
   Sparkles, 
   RotateCcw, 
-  Play, 
-  ShieldCheck, 
   Activity,
   ArrowUpRight,
-  ExternalLink
+  ShieldAlert,
+  Zap
 } from 'lucide-react';
 
 export default function Header({ 
@@ -19,28 +18,28 @@ export default function Header({
   const pendingCount = stats?.failedCount || 0;
 
   return (
-    <header className="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-md sticky top-0 z-30">
+    <header className="border-b border-sand-300/60 bg-creme-50/80 backdrop-blur-md sticky top-0 z-30 transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           
           {/* Logo & Title */}
           <div className="flex items-center space-x-3.5">
-            <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-brand-600 to-emerald-400 p-[1.5px] shadow-lg shadow-brand-500/20">
-              <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
-                <Bot className="w-6 h-6 text-brand-400" />
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-burgundy-700 via-burgundy-600 to-dustypink-400 p-[1.5px] shadow-md shadow-burgundy-900/15 transition-transform hover:scale-105 duration-300">
+              <div className="w-full h-full bg-creme-50 rounded-[14px] flex items-center justify-center">
+                <Bot className="w-6 h-6 text-burgundy-700" />
               </div>
             </div>
             <div>
               <div className="flex items-center space-x-2.5">
-                <h1 className="text-xl font-bold tracking-tight text-white flex items-center gap-1.5">
+                <h1 className="text-2xl font-serif-luxury font-bold tracking-tight text-burgundy-950 flex items-center gap-2">
                   Recover
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-400 border border-brand-500/20 font-mono font-medium">
-                    AI Agent v1.0
+                  <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-dustypink-100 text-burgundy-700 border border-dustypink-300 font-sans font-semibold tracking-normal">
+                    AI Agent
                   </span>
                 </h1>
               </div>
-              <p className="text-xs text-slate-400 flex items-center gap-1.5 mt-0.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <p className="text-xs text-sand-700 flex items-center gap-2 mt-0.5 font-medium">
+                <span className="w-2 h-2 rounded-full bg-burgundy-600 animate-ping"></span>
                 Autonomous Revenue Recovery & Involuntary Churn Engine
               </p>
             </div>
@@ -50,33 +49,33 @@ export default function Header({
           <div className="flex items-center space-x-3">
             <button
               onClick={onReset}
-              className="inline-flex items-center px-3.5 py-2 text-xs font-medium rounded-lg text-slate-300 bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/60 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-500/40"
+              className="inline-flex items-center px-4 py-2 text-xs font-semibold rounded-xl text-sand-800 bg-sand-100 hover:bg-sand-200 border border-sand-300/80 transition-all duration-200 shadow-sm hover:shadow active:scale-95"
               title="Reset dataset to initial 30 seed records"
             >
-              <RotateCcw className="w-3.5 h-3.5 mr-1.5 text-slate-400" />
+              <RotateCcw className="w-3.5 h-3.5 mr-1.5 text-sand-700" />
               Reset Demo
             </button>
 
             <button
               onClick={onRecoverAll}
               disabled={isRecovering || pendingCount === 0}
-              className={`inline-flex items-center px-4 py-2 text-xs font-semibold rounded-lg shadow-md transition-all ${
+              className={`inline-flex items-center px-5 py-2.5 text-xs font-bold rounded-xl shadow-md transition-all duration-300 active:scale-95 ${
                 pendingCount === 0
-                  ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700/50'
-                  : 'bg-gradient-to-r from-brand-600 to-emerald-600 hover:from-brand-500 hover:to-emerald-500 text-white shadow-emerald-950/40 ring-1 ring-emerald-400/30'
+                  ? 'bg-sand-200 text-sand-500 cursor-not-allowed border border-sand-300'
+                  : 'bg-gradient-to-r from-burgundy-800 via-burgundy-700 to-burgundy-600 hover:from-burgundy-900 hover:to-burgundy-700 text-creme-50 shadow-burgundy-900/20 hover:shadow-lg hover:shadow-burgundy-800/30 ring-1 ring-dustypink-300/30'
               }`}
             >
               {isRecovering ? (
                 <>
-                  <Activity className="w-3.5 h-3.5 mr-2 animate-spin text-white" />
+                  <Activity className="w-4 h-4 mr-2 animate-spin text-dustypink-200" />
                   Processing Recovery...
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-3.5 h-3.5 mr-1.5 text-emerald-200" />
+                  <Sparkles className="w-4 h-4 mr-2 text-dustypink-300" />
                   Run AI Recovery Agent
                   {pendingCount > 0 && (
-                    <span className="ml-2 px-1.5 py-0.5 text-[10px] bg-white/20 rounded-full font-mono">
+                    <span className="ml-2.5 px-2 py-0.5 text-[10px] bg-dustypink-200 text-burgundy-900 rounded-full font-mono font-bold">
                       {pendingCount} Pending
                     </span>
                   )}

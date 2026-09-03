@@ -9,12 +9,10 @@ import {
   AlertTriangle, 
   DollarSign, 
   CheckCircle2, 
-  Clock, 
   ShieldAlert, 
   TrendingUp,
   Sparkles,
   Bot,
-  Activity,
   Check
 } from 'lucide-react';
 
@@ -109,11 +107,11 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-400 space-y-4">
-        <div className="w-12 h-12 rounded-2xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center animate-pulse">
-          <Bot className="w-6 h-6 text-brand-400" />
+      <div className="min-h-screen bg-creme-100 flex flex-col items-center justify-center text-sand-800 space-y-4">
+        <div className="w-14 h-14 rounded-3xl bg-dustypink-100 border border-dustypink-300 flex items-center justify-center animate-pulse shadow-soft">
+          <Bot className="w-7 h-7 text-burgundy-700" />
         </div>
-        <div className="text-sm font-medium text-slate-300">Initializing Recover AI Engine...</div>
+        <div className="text-base font-bold text-burgundy-950 font-serif-luxury">Initializing Recover AI Engine...</div>
       </div>
     );
   }
@@ -125,15 +123,16 @@ export default function App() {
   const recoveryRate = stats?.recoveryRate || 0;
 
   return (
-    <div className="min-h-screen bg-[#090d16] text-slate-100 flex flex-col selection:bg-brand-500/30 selection:text-white">
+    <div className="min-h-screen bg-creme-100 text-burgundy-950 flex flex-col selection:bg-dustypink-200 selection:text-burgundy-950">
+      
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 animate-bounce-short">
-          <div className="flex items-center space-x-2.5 px-4 py-3 bg-slate-900 border border-emerald-500/40 text-white rounded-xl shadow-2xl shadow-emerald-950/50">
-            <div className="p-1 rounded-full bg-emerald-500/20 text-emerald-400">
+          <div className="flex items-center space-x-3 px-5 py-3.5 bg-burgundy-950 border border-dustypink-400 text-creme-50 rounded-2xl shadow-soft-xl shadow-burgundy-950/40">
+            <div className="p-1.5 rounded-full bg-dustypink-300/20 text-dustypink-200">
               <Check className="w-4 h-4" />
             </div>
-            <span className="text-xs font-medium text-slate-200">{toastMessage}</span>
+            <span className="text-xs font-semibold">{toastMessage}</span>
           </div>
         </div>
       )}
@@ -150,29 +149,29 @@ export default function App() {
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         
         {/* Hero Section Banner */}
-        <div className="relative overflow-hidden rounded-3xl border border-slate-800/80 bg-gradient-to-br from-slate-900/90 via-slate-900/40 to-slate-950 p-6 sm:p-8">
-          <div className="absolute -right-16 -top-16 w-64 h-64 bg-brand-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -left-16 -bottom-16 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative overflow-hidden rounded-3xl border border-sand-300/80 bg-gradient-to-br from-creme-50 via-sand-50/90 to-dustypink-50/70 p-7 sm:p-9 shadow-soft-lg">
+          <div className="absolute -right-20 -top-20 w-72 h-72 bg-dustypink-200/40 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -left-20 -bottom-20 w-72 h-72 bg-sand-200/50 rounded-full blur-3xl pointer-events-none" />
 
           <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-            <div className="max-w-2xl space-y-2">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/10 text-brand-400 border border-brand-500/20 text-xs font-medium">
-                <Sparkles className="w-3.5 h-3.5" />
+            <div className="max-w-2xl space-y-2.5">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-dustypink-100 text-burgundy-800 border border-dustypink-300 text-xs font-bold font-sans">
+                <Sparkles className="w-3.5 h-3.5 text-burgundy-600" />
                 Autonomous Revenue Recovery
               </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+              <h2 className="text-2xl sm:text-4xl font-bold font-serif-luxury tracking-tight text-burgundy-950 leading-tight">
                 Turn Involuntary Churn into Recovered Revenue
               </h2>
-              <p className="text-sm text-slate-400 leading-relaxed">
-                Recover monitors failed subscription transactions, predicts customer payment behavior, and executes intelligent automated recovery workflows without human friction.
+              <p className="text-sm text-sand-800 leading-relaxed font-medium">
+                Recover monitors failed subscription transactions, predicts customer payment behavior, and executes intelligent automated recovery workflows with precision.
               </p>
             </div>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              <div className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800 text-center min-w-[140px]">
-                <div className="text-[11px] uppercase tracking-wider text-slate-400 font-medium">Live Status</div>
-                <div className="text-sm font-bold text-emerald-400 flex items-center justify-center gap-1.5 mt-1">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+              <div className="p-5 rounded-2xl bg-white/80 border border-sand-300/80 text-center min-w-[150px] shadow-sm">
+                <div className="text-[11px] uppercase tracking-wider text-sand-700 font-bold">System Status</div>
+                <div className="text-sm font-bold text-burgundy-800 flex items-center justify-center gap-2 mt-1.5 font-serif-luxury">
+                  <span className="w-2.5 h-2.5 rounded-full bg-burgundy-600 animate-pulse"></span>
                   Active Monitoring
                 </div>
               </div>
@@ -214,9 +213,9 @@ export default function App() {
           <MetricCard
             title="Pending & Escalated"
             value={`$${(totalPending + totalEscalated).toLocaleString('en-US', { minimumFractionDigits: 2 })}`}
-            subtitle={`${stats?.pendingCount || 0} retrying in 3d • ${stats?.escalatedCount || 0} risk escalated`}
+            subtitle={`${stats?.pendingCount || 0} retrying in 3d • ${stats?.escalatedCount || 0} escalated`}
             icon={ShieldAlert}
-            variant="warning"
+            variant="default"
             badge={`${(stats?.pendingCount || 0) + (stats?.escalatedCount || 0)} cases`}
           />
         </div>
@@ -258,10 +257,10 @@ export default function App() {
       )}
 
       {/* Footer */}
-      <footer className="mt-auto border-t border-slate-800/80 bg-slate-950/60 py-6 text-xs text-slate-500 text-center">
+      <footer className="mt-auto border-t border-sand-300/80 bg-creme-50/70 py-6 text-xs text-sand-700 text-center font-medium">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>Recover AI Revenue Recovery Engine • Designed for SaaS Subscription Involuntary Churn</span>
-          <span className="font-mono">Node.js Express + React 18 + Tailwind CSS</span>
+          <span>Recover AI Revenue Recovery Engine • Built with Creme, Sand, Dusty Pink & Burgundy</span>
+          <span className="font-serif-luxury font-bold text-burgundy-900">Node.js Express + React 18</span>
         </div>
       </footer>
     </div>
