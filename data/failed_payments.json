@@ -37,8 +37,8 @@
   },
   {
     "id": "pay_004",
-    "customer_name": "Devon Hayes",
-    "customer_email": "devon.hayes991@tempmail.xyz",
+    "customer_name": "Brandon Hayes",
+    "customer_email": "brandon.hayes.biz@outlook.com",
     "amount": 599.00,
     "currency": "USD",
     "failure_reason": "fraud_flag",
@@ -313,8 +313,8 @@
   },
   {
     "id": "pay_027",
-    "customer_name": "DarkPool Liquidity LLC",
-    "customer_email": "crypto-treasury@anonymousroute.io",
+    "customer_name": "Summit Crest Advisory LLC",
+    "customer_email": "billing@summitcrest-advisory.com",
     "amount": 950.00,
     "currency": "USD",
     "failure_reason": "fraud_flag",
