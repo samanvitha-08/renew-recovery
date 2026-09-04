@@ -1,29 +1,37 @@
 const crypto = require('crypto');
 
-// Demo Accounts stored securely server-side
-const DEMO_USERS = [
+// Server-side accounts configuration
+const USERS = [
   {
-    username: 'admin',
-    passwords: ['demo pass', 'demopass', 'admin123', 'admin', 'password'],
-    name: 'Alex Rivera',
-    email: 'alex.rivera@recover.ai',
+    username: 'samanvitha@recover.demo',
+    passwords: ['Recover@2026'],
+    name: 'Samanvitha',
+    email: 'samanvitha@recover.demo',
     role: 'Admin', // Full access
     permissions: ['read', 'execute', 'batch_execute', 'reset', 'audit_export']
   },
   {
+    username: 'admin',
+    passwords: ['Recover@2026', 'demo pass', 'demopass', 'admin123', 'password'],
+    name: 'Alex Rivera',
+    email: 'admin@recover.demo',
+    role: 'Admin',
+    permissions: ['read', 'execute', 'batch_execute', 'reset', 'audit_export']
+  },
+  {
     username: 'ops1',
-    passwords: ['demo pass', 'demopass', 'ops123', 'ops', 'password'],
+    passwords: ['Recover@2026', 'demo pass', 'demopass', 'ops123', 'password'],
     name: 'Taylor Kim',
-    email: 'taylor.kim@recover.ai',
-    role: 'Ops', // Can execute recoveries
+    email: 'ops1@recover.demo',
+    role: 'Ops',
     permissions: ['read', 'execute', 'batch_execute']
   },
   {
     username: 'viewer',
-    passwords: ['demo pass', 'demopass', 'viewer123', 'viewer', 'password'],
+    passwords: ['Recover@2026', 'demo pass', 'demopass', 'viewer123', 'password'],
     name: 'Jordan Lee',
-    email: 'jordan.lee@recover.ai',
-    role: 'Viewer', // Read-only, execute buttons disabled
+    email: 'viewer@recover.demo',
+    role: 'Viewer',
     permissions: ['read']
   }
 ];
@@ -39,12 +47,12 @@ function authenticate(username, password) {
   const cleanUser = username.trim().toLowerCase();
   const cleanPass = password.trim();
 
-  const user = DEMO_USERS.find(u => u.username.toLowerCase() === cleanUser);
+  const user = USERS.find(u => u.username.toLowerCase() === cleanUser);
   if (!user) {
     return { success: false, error: 'Invalid credentials. User not found.' };
   }
 
-  const isMatch = user.passwords.some(p => p.toLowerCase() === cleanPass.toLowerCase());
+  const isMatch = user.passwords.some(p => p === cleanPass || p.toLowerCase() === cleanPass.toLowerCase());
   if (!isMatch) {
     return { success: false, error: 'Invalid password. Please check your credentials.' };
   }
@@ -83,7 +91,7 @@ function logout(token) {
 }
 
 module.exports = {
-  DEMO_USERS: DEMO_USERS.map(u => ({ username: u.username, role: u.role, name: u.name })),
+  USERS: USERS.map(u => ({ username: u.username, role: u.role, name: u.name })),
   authenticate,
   verifyToken,
   logout

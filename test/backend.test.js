@@ -45,7 +45,11 @@ assert(testFraud.risk_signal.length > 0, 'has risk signal explanation');
 console.log('✅ Decision engine & bank notification simulation verified.');
 
 // Test 3: Authentication & Roles
-const adminLogin = authenticate('admin', 'demo pass');
+const primaryLogin = authenticate('samanvitha@recover.demo', 'Recover@2026');
+assert.strictEqual(primaryLogin.success, true, 'Primary login succeeds');
+assert.strictEqual(primaryLogin.user.role, 'Admin', 'Primary user has Admin role');
+
+const adminLogin = authenticate('admin', 'Recover@2026');
 assert.strictEqual(adminLogin.success, true, 'Admin login succeeds');
 assert.strictEqual(adminLogin.user.role, 'Admin', 'Admin role assigned');
 
