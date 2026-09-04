@@ -8,13 +8,29 @@ import {
   AlertTriangle, 
   ShieldAlert, 
   History,
-  FileCode
+  FileCode,
+  Lock,
+  ShieldCheck
 } from 'lucide-react';
+
+function maskEmail(email) {
+  if (!email) return 'customer@***.com';
+  const [local, domain] = email.split('@');
+  if (!domain) return email;
+  const dotIndex = domain.lastIndexOf('.');
+  const tld = dotIndex !== -1 ? domain.substring(dotIndex) : '.com';
+  const parts = local.split('.');
+  if (parts.length > 1) {
+    return `${parts[0].charAt(0)}.${parts.slice(1).join('.')}@***${tld}`;
+  }
+  return `${local.charAt(0)}***@***${tld}`;
+}
 
 export default function PaymentDetailModal({ payment, onClose, onExecuteAction }) {
   if (!payment) return null;
 
   const isPending = payment.status === 'failed';
+  const isFraud = payment.failure_reason === 'fraud_flag';
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-burgundy-950/60 backdrop-blur-sm animate-fadeIn">
@@ -37,8 +53,14 @@ export default function PaymentDetailModal({ payment, onClose, onExecuteAction }
                   {payment.plan_name || 'Subscription Plan'}
                 </span>
               </div>
-              <p className="text-xs text-sand-700 mt-1 font-medium">
-                Customer: <span className="text-burgundy-950 font-bold">{payment.customer_name}</span> ({payment.customer_email})
+              <p className="text-xs text-sand-700 mt-1 font-medium flex items-center gap-1.5">
+                <span>Customer: <strong className="text-burgundy-950 font-bold">{payment.customer_name}</strong></span>
+                <span className="text-sand-400">•</span>
+                <span className="font-mono text-sand-600">({maskEmail(payment.customer_email)})</span>
+                <span className="text-sand-400">•</span>
+                <span className="font-mono bg-sand-200/80 px-1.5 py-0.2 rounded text-[11px] text-sand-800">
+                  ****{payment.card_last4 || '••••'}
+                </span>
               </p>
             </div>
           </div>
@@ -63,7 +85,7 @@ export default function PaymentDetailModal({ payment, onClose, onExecuteAction }
               </div>
             </div>
             <div>
-              <span className="text-[11px] text-sand-700 font-bold uppercase tracking-wider">Customer Loyalty</span>
+              <span className="text-[11px] text-sand-700 font-bold uppercase tracking-wider">Customer History</span>
               <div className="text-sm font-bold text-burgundy-900 mt-1 flex items-center gap-1.5 font-mono">
                 <History className="w-4 h-4 text-burgundy-700" />
                 {payment.past_successful_payments} past payments
@@ -102,6 +124,17 @@ export default function PaymentDetailModal({ payment, onClose, onExecuteAction }
                 </span>
               </div>
 
+              {/* Risk Signal Callout */}
+              {isFraud && (
+                <div className="p-3 bg-burgundy-100/80 rounded-xl border border-burgundy-300 text-xs text-burgundy-950 flex items-start gap-2">
+                  <ShieldAlert className="w-4 h-4 text-burgundy-700 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold">Risk Signal: </span>
+                    <span>{payment.risk_signal || 'New account, zero payment history, high transaction amount relative to plan tier'}</span>
+                  </div>
+                </div>
+              )}
+
               <div className="pt-3 border-t border-sand-200">
                 <span className="text-xs font-bold text-burgundy-950">Autonomous Reasoning:</span>
                 <p className="mt-1.5 text-xs leading-relaxed bg-creme-100/90 p-3.5 rounded-xl border border-sand-200 text-burgundy-950 font-medium">
@@ -132,7 +165,7 @@ export default function PaymentDetailModal({ payment, onClose, onExecuteAction }
         </div>
 
         {/* Modal Footer */}
-        <div className="p-5 sm:p-6 border-t border-sand-200 bg-creme-100/70 flex items-center justify-between">
+        <div className="p-5 sm:p-6 border-t border-sand-200 bg-creme-100/70 flex flex-col sm:flex-row items-center justify-between gap-3">
           <span className="text-xs text-sand-700 font-mono font-medium">
             Date: {new Date(payment.date).toLocaleString()}
           </span>
@@ -145,16 +178,26 @@ export default function PaymentDetailModal({ payment, onClose, onExecuteAction }
               Close
             </button>
             {isPending && (
-              <button
-                onClick={() => {
-                  onExecuteAction(payment.id);
-                  onClose();
-                }}
-                className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl text-creme-50 bg-gradient-to-r from-burgundy-800 to-burgundy-600 hover:from-burgundy-900 hover:to-burgundy-700 shadow-md shadow-burgundy-900/20 transition-all active:scale-95"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-dustypink-300" />
-                Execute Autonomous Action
-              </button>
+              isFraud ? (
+                <div 
+                  className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl text-burgundy-900 bg-sand-200/90 border border-sand-300 cursor-not-allowed opacity-90 shadow-2xs"
+                  title="Compliance policy blocks 1-click execution on high fraud risk flags"
+                >
+                  <Lock className="w-3.5 h-3.5 text-burgundy-700" />
+                  Requires Human Approval
+                </div>
+              ) : (
+                <button
+                  onClick={() => {
+                    onExecuteAction(payment.id);
+                    onClose();
+                  }}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl text-creme-50 bg-gradient-to-r from-burgundy-800 to-burgundy-600 hover:from-burgundy-900 hover:to-burgundy-700 shadow-md shadow-burgundy-900/20 transition-all active:scale-95"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-dustypink-300" />
+                  Execute Autonomous Action
+                </button>
+              )
             )}
           </div>
         </div>

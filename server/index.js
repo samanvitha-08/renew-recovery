@@ -37,13 +37,23 @@ app.get('/api/payments', (req, res) => {
 
   res.json({
     payments,
-    stats: store.getStats()
+    stats: store.getStats(),
+    auditLogs: store.getAuditLogs()
   });
 });
 
 // Get statistics summary and breakdown
 app.get('/api/stats', (req, res) => {
   res.json(store.getStats());
+});
+
+// Get read-only tamper-evident audit logs
+app.get('/api/audit-logs', (req, res) => {
+  res.json({
+    auditLogs: store.getAuditLogs(),
+    totalEntries: store.getAuditLogs().length,
+    tamperEvidentLedger: true
+  });
 });
 
 // Simulate executing recovery action on a single payment
@@ -56,7 +66,8 @@ app.post('/api/payments/:id/recover', (req, res) => {
   res.json({
     message: `Recovery action executed for ${payment.customer_name}`,
     payment,
-    stats: store.getStats()
+    stats: store.getStats(),
+    auditLogs: store.getAuditLogs()
   });
 });
 
@@ -67,6 +78,7 @@ app.post('/api/payments/recover-all', (req, res) => {
     message: `Autonomously processed ${result.processedCount} payment(s)`,
     processedCount: result.processedCount,
     payments: result.payments,
+    auditLogs: result.auditLogs,
     stats: result.stats
   });
 });
@@ -77,6 +89,7 @@ app.post('/api/reset', (req, res) => {
   res.json({
     message: 'Reset demo data to initial seed state',
     payments: store.getPayments(),
+    auditLogs: store.getAuditLogs(),
     stats
   });
 });

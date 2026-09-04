@@ -5,6 +5,7 @@ import FailureChart from './components/FailureChart';
 import AgentRulesBanner from './components/AgentRulesBanner';
 import PaymentTable from './components/PaymentTable';
 import PaymentDetailModal from './components/PaymentDetailModal';
+import AuditLogModal from './components/AuditLogModal';
 import { 
   AlertTriangle, 
   DollarSign, 
@@ -13,17 +14,21 @@ import {
   TrendingUp,
   Sparkles,
   Bot,
-  Check
+  Check,
+  Lock,
+  ShieldCheck
 } from 'lucide-react';
 
 export default function App() {
   const [payments, setPayments] = useState([]);
   const [stats, setStats] = useState(null);
+  const [auditLogs, setAuditLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isRecovering, setIsRecovering] = useState(false);
   const [selectedReason, setSelectedReason] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeModalPayment, setActiveModalPayment] = useState(null);
+  const [isAuditLogOpen, setIsAuditLogOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
 
   const showToast = (msg) => {
@@ -39,6 +44,7 @@ export default function App() {
       const data = await res.json();
       setPayments(data.payments || []);
       setStats(data.stats || null);
+      setAuditLogs(data.auditLogs || []);
     } catch (err) {
       console.error('Error fetching data:', err);
     } finally {
@@ -58,6 +64,9 @@ export default function App() {
       if (data.payment) {
         setPayments(prev => prev.map(p => p.id === id ? data.payment : p));
         setStats(data.stats);
+        if (data.auditLogs) {
+          setAuditLogs(data.auditLogs);
+        }
         showToast(`Action executed: ${data.payment.action} for ${data.payment.customer_name} ($${data.payment.amount})`);
         
         // Update modal if open
@@ -79,6 +88,9 @@ export default function App() {
       if (data.payments) {
         setPayments(data.payments);
         setStats(data.stats);
+        if (data.auditLogs) {
+          setAuditLogs(data.auditLogs);
+        }
         showToast(`AI Agent processed ${data.processedCount} payments! Recovered $${data.stats.totalRecovered.toFixed(2)}`);
       }
     } catch (err) {
@@ -96,6 +108,9 @@ export default function App() {
       if (data.payments) {
         setPayments(data.payments);
         setStats(data.stats);
+        if (data.auditLogs) {
+          setAuditLogs(data.auditLogs);
+        }
         setSelectedReason('all');
         setSearchQuery('');
         showToast('Demo dataset reset to initial 30 seed records.');
@@ -143,6 +158,7 @@ export default function App() {
         onRecoverAll={handleRecoverAll}
         onReset={handleReset}
         isRecovering={isRecovering}
+        onOpenAuditLog={() => setIsAuditLogOpen(true)}
       />
 
       {/* Main Dashboard Content */}
@@ -168,11 +184,14 @@ export default function App() {
             </div>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              <div className="p-5 rounded-2xl bg-white/80 border border-sand-300/80 text-center min-w-[150px] shadow-sm">
+              <div className="p-5 rounded-2xl bg-white/80 border border-sand-300/80 text-center min-w-[160px] shadow-sm">
                 <div className="text-[11px] uppercase tracking-wider text-sand-700 font-bold">System Status</div>
                 <div className="text-sm font-bold text-burgundy-800 flex items-center justify-center gap-2 mt-1.5 font-serif-luxury">
                   <span className="w-2.5 h-2.5 rounded-full bg-burgundy-600 animate-pulse"></span>
                   Active Monitoring
+                </div>
+                <div className="text-[10px] text-sand-600 font-medium mt-1">
+                  🔒 SOC2 Audit Active
                 </div>
               </div>
             </div>
@@ -242,6 +261,7 @@ export default function App() {
             onSelectReason={setSelectedReason}
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
+            onOpenAuditLog={() => setIsAuditLogOpen(true)}
           />
         </div>
 
@@ -256,11 +276,25 @@ export default function App() {
         />
       )}
 
-      {/* Footer */}
-      <footer className="mt-auto border-t border-sand-300/80 bg-creme-50/70 py-6 text-xs text-sand-700 text-center font-medium">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>Recover AI Revenue Recovery Engine • Built with Creme, Sand, Dusty Pink & Burgundy</span>
-          <span className="font-serif-luxury font-bold text-burgundy-900">Node.js Express + React 18</span>
+      {/* Security Audit Log Modal */}
+      {isAuditLogOpen && (
+        <AuditLogModal
+          logs={auditLogs}
+          onClose={() => setIsAuditLogOpen(false)}
+        />
+      )}
+
+      {/* Clean Minimal Footer */}
+      <footer className="mt-auto border-t border-sand-300/80 bg-creme-50/70 py-6 text-xs text-sand-700 font-medium">
+        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+          <div>
+            <span className="font-serif-luxury font-bold text-sm text-burgundy-950">Recover</span>
+            <span className="mx-2 text-sand-400">•</span>
+            <span className="text-sand-700">Autonomous Revenue Recovery for Payment Platforms</span>
+          </div>
+          <div className="inline-flex items-center gap-1.5 text-sand-600 bg-sand-100/80 px-3 py-1 rounded-full border border-sand-200/80 font-mono text-[11px]">
+            <span>🔒 Data encrypted in transit & at rest</span>
+          </div>
         </div>
       </footer>
     </div>

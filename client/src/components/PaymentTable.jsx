@@ -14,7 +14,10 @@ import {
   Search,
   Filter,
   Sparkles,
-  Info
+  Info,
+  Lock,
+  ShieldCheck,
+  AlertTriangle
 } from 'lucide-react';
 
 const REASON_CONFIG = {
@@ -65,7 +68,7 @@ const ACTION_CONFIG = {
 
 const STATUS_CONFIG = {
   failed: {
-    label: 'Failed',
+    label: 'Action Needed',
     badgeClass: 'bg-dustypink-100 text-dustypink-800 border-dustypink-300',
     icon: AlertCircle
   },
@@ -86,6 +89,29 @@ const STATUS_CONFIG = {
   }
 };
 
+// Mask email partially: e.g. "s.martinez@***.io"
+function maskEmail(email) {
+  if (!email) return 'customer@***.com';
+  const [local, domain] = email.split('@');
+  if (!domain) return email;
+  const dotIndex = domain.lastIndexOf('.');
+  const tld = dotIndex !== -1 ? domain.substring(dotIndex) : '.com';
+  
+  // Format as e.g. "s.martinez@***.io" or "b.hayes.biz@***.com"
+  const parts = local.split('.');
+  if (parts.length > 1) {
+    const formattedFirst = parts[0].charAt(0);
+    const rest = parts.slice(1).join('.');
+    return `${formattedFirst}.${rest}@***${tld}`;
+  }
+  return `${local.charAt(0)}***@***${tld}`;
+}
+
+// Mask card: e.g. "****4242"
+function maskCard(last4) {
+  return `****${last4 || '••••'}`;
+}
+
 export default function PaymentTable({ 
   payments, 
   onExecuteAction, 
@@ -93,7 +119,8 @@ export default function PaymentTable({
   selectedReason,
   onSelectReason,
   searchQuery,
-  onSearchChange
+  onSearchChange,
+  onOpenAuditLog
 }) {
   const [activeTab, setActiveTab] = useState('all');
 
@@ -136,7 +163,7 @@ export default function PaymentTable({
         <div className="flex items-center space-x-2 overflow-x-auto pb-2 lg:pb-0">
           {[
             { id: 'all', label: 'All Payments' },
-            { id: 'failed', label: 'Failed' },
+            { id: 'failed', label: 'Action Needed' },
             { id: 'recovered', label: 'Recovered' },
             { id: 'pending', label: 'Pending Retry' },
             { id: 'escalated', label: 'Escalated' }
@@ -200,12 +227,12 @@ export default function PaymentTable({
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-sand-200/80 bg-sand-100/60 text-[11px] font-bold uppercase tracking-wider text-sand-800">
-              <th className="py-3.5 px-5">Customer</th>
+              <th className="py-3.5 px-5">Customer & Card</th>
               <th className="py-3.5 px-5">Amount</th>
               <th className="py-3.5 px-5">History</th>
               <th className="py-3.5 px-5">Failure Reason</th>
               <th className="py-3.5 px-5">AI Strategy</th>
-              <th className="py-3.5 px-5 min-w-[240px]">Autonomous Rationale</th>
+              <th className="py-3.5 px-5 min-w-[260px]">Autonomous Rationale & Signals</th>
               <th className="py-3.5 px-5">Status</th>
               <th className="py-3.5 px-5 text-right">Actions</th>
             </tr>
@@ -216,7 +243,7 @@ export default function PaymentTable({
                 <td colSpan="8" className="py-14 text-center text-sand-600">
                   <div className="flex flex-col items-center justify-center space-y-2.5">
                     <HelpCircle className="w-9 h-9 text-sand-400" />
-                    <p className="text-sm font-bold text-burgundy-900 font-serif-luxury">No payments match the filter criteria</p>
+                    <p className="text-sm font-bold text-burgundy-950 font-serif-luxury">No payments match the filter criteria</p>
                     <p className="text-xs text-sand-600">Try adjusting your search query or selected cause</p>
                   </div>
                 </td>
@@ -230,6 +257,8 @@ export default function PaymentTable({
                 const ActionIcon = actionMeta.icon;
                 const StatusIcon = statusMeta.icon;
                 const historyCount = payment.past_successful_payments || 0;
+                const isFraud = payment.failure_reason === 'fraud_flag';
+                const isFailed = payment.status === 'failed';
 
                 return (
                   <tr 
@@ -237,16 +266,20 @@ export default function PaymentTable({
                     className="hover:bg-creme-200/40 transition-colors group cursor-pointer"
                     onClick={() => onSelectPayment(payment)}
                   >
-                    {/* Customer */}
+                    {/* Customer & Masked Card */}
                     <td className="py-4 px-5">
                       <div className="font-bold text-burgundy-950 group-hover:text-burgundy-700 transition-colors">
                         {payment.customer_name}
                       </div>
-                      <div className="text-[11px] text-sand-700 font-mono">
-                        {payment.customer_email || payment.id}
+                      <div className="text-[11px] text-sand-700 font-mono flex items-center gap-1.5 mt-0.5">
+                        <span>{maskEmail(payment.customer_email)}</span>
+                        <span className="text-sand-400">•</span>
+                        <span className="text-sand-600 font-bold bg-sand-100 px-1.5 py-0.2 rounded border border-sand-200/60">
+                          {maskCard(payment.card_last4)}
+                        </span>
                       </div>
                       {payment.plan_name && (
-                        <span className="text-[10px] text-sand-600 font-medium">
+                        <span className="text-[10px] text-sand-600 font-medium block mt-0.5">
                           {payment.plan_name}
                         </span>
                       )}
@@ -287,11 +320,21 @@ export default function PaymentTable({
                       </span>
                     </td>
 
-                    {/* AI Reasoning */}
-                    <td className="py-4 px-5 text-xs text-sand-900 max-w-xs">
+                    {/* AI Reasoning & Risk Signal */}
+                    <td className="py-4 px-5 text-xs text-sand-900 max-w-sm">
                       <div className="line-clamp-2 text-[11px] leading-relaxed text-sand-800 font-medium">
                         {payment.reasoning}
                       </div>
+
+                      {/* Risk Signal Line for Fraud Flag cases */}
+                      {isFraud && (
+                        <div className="mt-1.5 inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-burgundy-100/90 text-burgundy-900 border border-burgundy-300/80 text-[10px] font-medium leading-tight">
+                          <AlertTriangle className="w-3 h-3 text-burgundy-700 flex-shrink-0" />
+                          <span>
+                            <strong>Risk Signal:</strong> {payment.risk_signal || 'New account, zero payment history, high transaction amount relative to plan tier'}
+                          </span>
+                        </div>
+                      )}
                     </td>
 
                     {/* Status */}
@@ -304,14 +347,26 @@ export default function PaymentTable({
 
                     {/* Actions */}
                     <td className="py-4 px-5 text-right" onClick={(e) => e.stopPropagation()}>
-                      {payment.status === 'failed' ? (
-                        <button
-                          onClick={() => onExecuteAction(payment.id)}
-                          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-xl text-creme-50 bg-gradient-to-r from-burgundy-800 to-burgundy-600 hover:from-burgundy-900 hover:to-burgundy-700 shadow-sm shadow-burgundy-900/20 hover:shadow transition-all active:scale-95"
-                        >
-                          <Sparkles className="w-3 h-3 text-dustypink-300" />
-                          Execute
-                        </button>
+                      {isFailed ? (
+                        isFraud ? (
+                          /* Fraud cases cannot be one-click auto-executed: Disabled button with Human Approval requirement */
+                          <div 
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-xl text-burgundy-900 bg-sand-200/90 border border-sand-300 cursor-not-allowed opacity-90 shadow-2xs"
+                            title="Compliance Policy: Fraud flags require manual human compliance verification before execution"
+                          >
+                            <Lock className="w-3 h-3 text-burgundy-700" />
+                            Requires Human Approval
+                          </div>
+                        ) : (
+                          /* Standard recoverable cases */
+                          <button
+                            onClick={() => onExecuteAction(payment.id)}
+                            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-xl text-creme-50 bg-gradient-to-r from-burgundy-800 to-burgundy-600 hover:from-burgundy-900 hover:to-burgundy-700 shadow-sm shadow-burgundy-900/20 hover:shadow transition-all active:scale-95"
+                          >
+                            <Sparkles className="w-3 h-3 text-dustypink-300" />
+                            Execute
+                          </button>
+                        )
                       ) : (
                         <button
                           onClick={() => onSelectPayment(payment)}
@@ -331,12 +386,21 @@ export default function PaymentTable({
       </div>
 
       {/* Table Footer */}
-      <div className="p-4 bg-sand-100/50 border-t border-sand-200/80 flex items-center justify-between text-xs text-sand-700 font-medium">
+      <div className="p-4 bg-sand-100/50 border-t border-sand-200/80 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-sand-700 font-medium">
         <div>
           Showing <span className="text-burgundy-950 font-bold">{filteredPayments.length}</span> of <span className="text-burgundy-950 font-bold">{payments.length}</span> payment records
         </div>
-        <div className="font-mono text-sand-800">
-          Auto-evaluating with autonomous recovery rules
+        <div className="flex items-center gap-3">
+          <span className="font-mono text-sand-700">🔒 PII Masked & Tokenized</span>
+          {onOpenAuditLog && (
+            <button
+              onClick={onOpenAuditLog}
+              className="text-burgundy-800 hover:text-burgundy-950 font-bold underline font-sans flex items-center gap-1"
+            >
+              <ShieldCheck className="w-3.5 h-3.5" />
+              View Security Audit Log
+            </button>
+          )}
         </div>
       </div>
     </div>
