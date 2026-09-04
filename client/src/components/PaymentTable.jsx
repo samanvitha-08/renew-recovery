@@ -16,7 +16,8 @@ import {
   Sparkles,
   Info,
   Lock,
-  ShieldCheck,
+  Eye,
+  RefreshCw,
   AlertTriangle
 } from 'lucide-react';
 
@@ -97,7 +98,6 @@ function maskEmail(email) {
   const dotIndex = domain.lastIndexOf('.');
   const tld = dotIndex !== -1 ? domain.substring(dotIndex) : '.com';
   
-  // Format as e.g. "s.martinez@***.io" or "b.hayes.biz@***.com"
   const parts = local.split('.');
   if (parts.length > 1) {
     const formattedFirst = parts[0].charAt(0);
@@ -116,13 +116,17 @@ export default function PaymentTable({
   payments, 
   onExecuteAction, 
   onSelectPayment,
+  onOpenCustomerView,
   selectedReason,
   onSelectReason,
   searchQuery,
   onSearchChange,
-  onOpenAuditLog
+  onOpenAuditLog,
+  processingMap = {},
+  userRole = 'Admin'
 }) {
   const [activeTab, setActiveTab] = useState('all');
+  const isViewer = userRole === 'Viewer';
 
   const filteredPayments = payments.filter(p => {
     // Reason filter
@@ -141,7 +145,8 @@ export default function PaymentTable({
       const matchId = p.id?.toLowerCase().includes(q);
       const matchReason = p.failure_reason?.toLowerCase().includes(q);
       const matchAction = p.action?.toLowerCase().includes(q);
-      if (!matchName && !matchEmail && !matchId && !matchReason && !matchAction) {
+      const matchBank = p.bank_name?.toLowerCase().includes(q);
+      if (!matchName && !matchEmail && !matchId && !matchReason && !matchAction && !matchBank) {
         return false;
       }
     }
@@ -197,7 +202,7 @@ export default function PaymentTable({
             <Search className="w-4 h-4 text-sand-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search customer, ID, reason..."
+              placeholder="Search customer, ID, bank..."
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               className="w-full bg-white/80 border border-sand-300/80 rounded-xl pl-9 pr-3.5 py-2 text-xs text-burgundy-950 placeholder-sand-500 focus:outline-none focus:border-burgundy-600 focus:ring-2 focus:ring-burgundy-600/10 transition-all font-medium"
@@ -232,7 +237,7 @@ export default function PaymentTable({
               <th className="py-3.5 px-5">History</th>
               <th className="py-3.5 px-5">Failure Reason</th>
               <th className="py-3.5 px-5">AI Strategy</th>
-              <th className="py-3.5 px-5 min-w-[260px]">Autonomous Rationale & Signals</th>
+              <th className="py-3.5 px-5 min-w-[260px]">Autonomous Rationale & Bank Signal</th>
               <th className="py-3.5 px-5">Status</th>
               <th className="py-3.5 px-5 text-right">Actions</th>
             </tr>
@@ -259,6 +264,10 @@ export default function PaymentTable({
                 const historyCount = payment.past_successful_payments || 0;
                 const isFraud = payment.failure_reason === 'fraud_flag';
                 const isFailed = payment.status === 'failed';
+                
+                // Active 30-second processing state for this payment
+                const processingInfo = processingMap[payment.id];
+                const isProcessing = !!processingInfo;
 
                 return (
                   <tr 
@@ -278,11 +287,18 @@ export default function PaymentTable({
                           {maskCard(payment.card_last4)}
                         </span>
                       </div>
-                      {payment.plan_name && (
-                        <span className="text-[10px] text-sand-600 font-medium block mt-0.5">
-                          {payment.plan_name}
-                        </span>
-                      )}
+                      <div className="flex items-center gap-2 mt-0.5">
+                        {payment.plan_name && (
+                          <span className="text-[10px] text-sand-600 font-medium">
+                            {payment.plan_name}
+                          </span>
+                        )}
+                        {payment.bank_name && (
+                          <span className="text-[10px] text-sand-500 font-mono">
+                            • {payment.bank_name}
+                          </span>
+                        )}
+                      </div>
                     </td>
 
                     {/* Amount */}
@@ -320,11 +336,19 @@ export default function PaymentTable({
                       </span>
                     </td>
 
-                    {/* AI Reasoning & Risk Signal */}
+                    {/* AI Reasoning, Risk Signal & Bank Notification status */}
                     <td className="py-4 px-5 text-xs text-sand-900 max-w-sm">
                       <div className="line-clamp-2 text-[11px] leading-relaxed text-sand-800 font-medium">
                         {payment.reasoning}
                       </div>
+
+                      {/* Bank Notification status telemetry */}
+                      {payment.bank_name && (
+                        <div className="mt-1 text-[10px] text-sand-600 font-mono flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                          <span>Decline reason sent to {payment.bank_name} for reference</span>
+                        </div>
+                      )}
 
                       {/* Risk Signal Line for Fraud Flag cases */}
                       {isFraud && (
@@ -337,45 +361,93 @@ export default function PaymentTable({
                       )}
                     </td>
 
-                    {/* Status */}
+                    {/* Status & Processing Progress */}
                     <td className="py-4 px-5">
-                      <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold border ${statusMeta.badgeClass}`}>
-                        <StatusIcon className="w-3 h-3" />
-                        {statusMeta.label}
-                      </span>
+                      {isProcessing ? (
+                        <div className="space-y-1">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold border bg-dustypink-100 text-burgundy-900 border-dustypink-300 animate-pulse">
+                            <RefreshCw className="w-3 h-3 animate-spin text-burgundy-700" />
+                            Processing ({processingInfo.secondsRemaining}s)
+                          </span>
+                          <div className="w-24 bg-sand-200 h-1.5 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-gradient-to-r from-dustypink-400 to-burgundy-700 transition-all duration-300"
+                              style={{ width: `${processingInfo.progress}%` }}
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold border ${statusMeta.badgeClass}`}>
+                          <StatusIcon className="w-3 h-3" />
+                          {statusMeta.label}
+                        </span>
+                      )}
                     </td>
 
-                    {/* Actions */}
+                    {/* Action Buttons */}
                     <td className="py-4 px-5 text-right" onClick={(e) => e.stopPropagation()}>
-                      {isFailed ? (
-                        isFraud ? (
-                          /* Fraud cases cannot be one-click auto-executed: Disabled button with Human Approval requirement */
-                          <div 
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-xl text-burgundy-900 bg-sand-200/90 border border-sand-300 cursor-not-allowed opacity-90 shadow-2xs"
-                            title="Compliance Policy: Fraud flags require manual human compliance verification before execution"
-                          >
-                            <Lock className="w-3 h-3 text-burgundy-700" />
-                            Requires Human Approval
-                          </div>
-                        ) : (
-                          /* Standard recoverable cases */
-                          <button
-                            onClick={() => onExecuteAction(payment.id)}
-                            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-xl text-creme-50 bg-gradient-to-r from-burgundy-800 to-burgundy-600 hover:from-burgundy-900 hover:to-burgundy-700 shadow-sm shadow-burgundy-900/20 hover:shadow transition-all active:scale-95"
-                          >
-                            <Sparkles className="w-3 h-3 text-dustypink-300" />
-                            Execute
-                          </button>
-                        )
-                      ) : (
+                      <div className="flex items-center justify-end space-x-1.5">
+                        
+                        {/* Customer View Button */}
                         <button
-                          onClick={() => onSelectPayment(payment)}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-xl text-sand-800 hover:text-burgundy-900 bg-sand-100 hover:bg-sand-200 border border-sand-300/80 transition-all shadow-2xs"
+                          onClick={() => onOpenCustomerView(payment)}
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold rounded-xl text-sand-800 hover:text-burgundy-900 bg-sand-100 hover:bg-sand-200 border border-sand-300/80 transition-all shadow-2xs"
+                          title="Preview what the customer sees"
                         >
-                          <Info className="w-3.5 h-3.5 text-sand-600" />
-                          Details
+                          <Eye className="w-3.5 h-3.5 text-sand-600" />
+                          Customer View
                         </button>
-                      )}
+
+                        {/* Execute / Details / Human Approval state */}
+                        {isFailed ? (
+                          isFraud ? (
+                            /* Fraud cases require human approval */
+                            <div 
+                              className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold rounded-xl text-burgundy-900 bg-sand-200/90 border border-sand-300 cursor-not-allowed opacity-90 shadow-2xs"
+                              title="Compliance Policy: Fraud flags require manual human compliance verification before execution"
+                            >
+                              <Lock className="w-3 h-3 text-burgundy-700" />
+                              Requires Human Approval
+                            </div>
+                          ) : isProcessing ? (
+                            /* Currently processing ~30 second recovery */
+                            <button
+                              disabled
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-xl text-sand-500 bg-sand-200 border border-sand-300 cursor-not-allowed"
+                            >
+                              <RefreshCw className="w-3 h-3 animate-spin text-burgundy-700" />
+                              Processing...
+                            </button>
+                          ) : isViewer ? (
+                            /* Viewer role: execute disabled */
+                            <button
+                              disabled
+                              className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold rounded-xl text-sand-500 bg-sand-200 border border-sand-300 cursor-not-allowed"
+                              title="Viewer role is read-only (Execute requires Admin or Ops)"
+                            >
+                              <Lock className="w-3 h-3 text-sand-500" />
+                              View-Only
+                            </button>
+                          ) : (
+                            /* Normal Execute Recovery */
+                            <button
+                              onClick={() => onExecuteAction(payment.id)}
+                              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-xl text-creme-50 bg-gradient-to-r from-burgundy-800 to-burgundy-600 hover:from-burgundy-900 hover:to-burgundy-700 shadow-sm shadow-burgundy-900/20 hover:shadow transition-all active:scale-95"
+                            >
+                              <Sparkles className="w-3 h-3 text-dustypink-300" />
+                              Execute
+                            </button>
+                          )
+                        ) : (
+                          <button
+                            onClick={() => onSelectPayment(payment)}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-xl text-sand-800 hover:text-burgundy-900 bg-sand-100 hover:bg-sand-200 border border-sand-300/80 transition-all shadow-2xs"
+                          >
+                            <Info className="w-3.5 h-3.5 text-sand-600" />
+                            Details
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 );
@@ -397,7 +469,6 @@ export default function PaymentTable({
               onClick={onOpenAuditLog}
               className="text-burgundy-800 hover:text-burgundy-950 font-bold underline font-sans flex items-center gap-1"
             >
-              <ShieldCheck className="w-3.5 h-3.5" />
               View Security Audit Log
             </button>
           )}

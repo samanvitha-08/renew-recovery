@@ -6,7 +6,9 @@ import {
   Activity,
   ShieldCheck,
   Lock,
-  FileText
+  FileText,
+  LogOut,
+  User
 } from 'lucide-react';
 
 export default function Header({ 
@@ -14,13 +16,16 @@ export default function Header({
   onReset, 
   isRecovering, 
   stats,
-  onOpenAuditLog
+  onOpenAuditLog,
+  user,
+  onLogout
 }) {
   const pendingCount = stats?.failedCount || 0;
+  const isViewer = user?.role === 'Viewer';
 
   return (
     <header className="border-b border-sand-300/60 bg-creme-50/80 backdrop-blur-md sticky top-0 z-30 transition-all">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           
           {/* Logo, Title & Security Badge */}
@@ -53,36 +58,60 @@ export default function Header({
             </div>
           </div>
 
-          {/* Action Controls */}
-          <div className="flex items-center space-x-2.5">
+          {/* User Profile & Action Controls */}
+          <div className="flex items-center space-x-2.5 flex-wrap gap-y-2">
             
+            {/* Logged in User Badge */}
+            {user && (
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/80 border border-sand-300/80 shadow-2xs">
+                <div className="w-6 h-6 rounded-lg bg-burgundy-100 text-burgundy-800 flex items-center justify-center font-bold text-[11px]">
+                  {user.name?.charAt(0) || 'U'}
+                </div>
+                <div className="text-left">
+                  <span className="block text-[11px] font-bold text-burgundy-950 leading-tight">
+                    {user.name || user.username}
+                  </span>
+                  <span className={`inline-block text-[9px] font-bold px-1.5 py-0.2 rounded font-mono ${
+                    user.role === 'Admin' ? 'bg-burgundy-100 text-burgundy-900' :
+                    user.role === 'Ops' ? 'bg-dustypink-100 text-dustypink-900' :
+                    'bg-sand-200 text-sand-800'
+                  }`}>
+                    {user.role} Role
+                  </span>
+                </div>
+              </div>
+            )}
+
             {/* Audit Log Trigger Button */}
             <button
               onClick={onOpenAuditLog}
-              className="inline-flex items-center px-3.5 py-2 text-xs font-semibold rounded-xl text-burgundy-900 bg-sand-100 hover:bg-sand-200 border border-sand-300/80 transition-all duration-200 shadow-2xs hover:shadow active:scale-95"
+              className="inline-flex items-center px-3 py-2 text-xs font-semibold rounded-xl text-burgundy-900 bg-sand-100 hover:bg-sand-200 border border-sand-300/80 transition-all duration-200 shadow-2xs hover:shadow active:scale-95"
               title="View tamper-evident decision audit trail"
             >
               <FileText className="w-3.5 h-3.5 mr-1.5 text-burgundy-700" />
               Audit Log
             </button>
 
+            {/* Reset Demo Button (Admin/Ops) */}
             <button
               onClick={onReset}
-              className="inline-flex items-center px-3.5 py-2 text-xs font-semibold rounded-xl text-sand-800 bg-sand-100 hover:bg-sand-200 border border-sand-300/80 transition-all duration-200 shadow-2xs hover:shadow active:scale-95"
+              className="inline-flex items-center px-3 py-2 text-xs font-semibold rounded-xl text-sand-800 bg-sand-100 hover:bg-sand-200 border border-sand-300/80 transition-all duration-200 shadow-2xs hover:shadow active:scale-95"
               title="Reset dataset to initial 30 seed records"
             >
               <RotateCcw className="w-3.5 h-3.5 mr-1.5 text-sand-700" />
               Reset Demo
             </button>
 
+            {/* Run AI Recovery Agent Button */}
             <button
               onClick={onRecoverAll}
-              disabled={isRecovering || pendingCount === 0}
+              disabled={isRecovering || pendingCount === 0 || isViewer}
               className={`inline-flex items-center px-4 py-2 text-xs font-bold rounded-xl shadow-md transition-all duration-300 active:scale-95 ${
-                pendingCount === 0
+                pendingCount === 0 || isViewer
                   ? 'bg-sand-200 text-sand-500 cursor-not-allowed border border-sand-300'
                   : 'bg-gradient-to-r from-burgundy-800 via-burgundy-700 to-burgundy-600 hover:from-burgundy-900 hover:to-burgundy-700 text-creme-50 shadow-burgundy-900/20 hover:shadow-lg hover:shadow-burgundy-800/30 ring-1 ring-dustypink-300/30'
               }`}
+              title={isViewer ? 'Viewer role is read-only' : 'Autonomously process all pending failed payments'}
             >
               {isRecovering ? (
                 <>
@@ -92,7 +121,7 @@ export default function Header({
               ) : (
                 <>
                   <Sparkles className="w-3.5 h-3.5 mr-1.5 text-dustypink-300" />
-                  Run AI Recovery Agent
+                  Run AI Agent
                   {pendingCount > 0 && (
                     <span className="ml-2 px-1.5 py-0.2 text-[10px] bg-dustypink-200 text-burgundy-900 rounded-full font-mono font-bold">
                       {pendingCount}
@@ -101,6 +130,18 @@ export default function Header({
                 </>
               )}
             </button>
+
+            {/* Logout Button */}
+            {onLogout && (
+              <button
+                onClick={onLogout}
+                className="p-2 rounded-xl text-sand-700 hover:text-burgundy-950 hover:bg-sand-200/80 border border-sand-300/70 transition-colors"
+                title="Logout session"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            )}
+
           </div>
 
         </div>

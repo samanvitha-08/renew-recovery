@@ -10,7 +10,9 @@ import {
   History,
   FileCode,
   Lock,
-  ShieldCheck
+  Building2,
+  Eye,
+  RefreshCw
 } from 'lucide-react';
 
 function maskEmail(email) {
@@ -26,11 +28,27 @@ function maskEmail(email) {
   return `${local.charAt(0)}***@***${tld}`;
 }
 
-export default function PaymentDetailModal({ payment, onClose, onExecuteAction }) {
+export default function PaymentDetailModal({ 
+  payment, 
+  onClose, 
+  onExecuteAction, 
+  onOpenCustomerView,
+  isProcessing = false,
+  userRole = 'Admin' 
+}) {
   if (!payment) return null;
 
   const isPending = payment.status === 'failed';
   const isFraud = payment.failure_reason === 'fraud_flag';
+  const isViewer = userRole === 'Viewer';
+
+  const bankNotification = payment.bank_notification || {
+    bank_name: payment.bank_name || 'Issuing Bank Network',
+    status: 'Notified',
+    event: 'Decline telemetry registered',
+    reference_id: `BNK-REF-${(payment.id || '00').toUpperCase()}`,
+    notified_at: payment.date || new Date().toISOString()
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-burgundy-950/60 backdrop-blur-sm animate-fadeIn">
@@ -65,12 +83,28 @@ export default function PaymentDetailModal({ payment, onClose, onExecuteAction }
             </div>
           </div>
 
-          <button
-            onClick={onClose}
-            className="p-2 rounded-xl text-sand-600 hover:text-burgundy-950 hover:bg-sand-200/80 transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center space-x-2">
+            {onOpenCustomerView && (
+              <button
+                onClick={() => {
+                  onClose();
+                  onOpenCustomerView(payment);
+                }}
+                className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold rounded-xl text-burgundy-900 bg-sand-100 hover:bg-sand-200 border border-sand-300 transition-all"
+                title="View customer-facing billing screen"
+              >
+                <Eye className="w-3.5 h-3.5 text-burgundy-700" />
+                Customer View
+              </button>
+            )}
+
+            <button
+              onClick={onClose}
+              className="p-2 rounded-xl text-sand-600 hover:text-burgundy-950 hover:bg-sand-200/80 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Modal Body */}
@@ -98,6 +132,29 @@ export default function PaymentDetailModal({ payment, onClose, onExecuteAction }
                 {payment.status === 'pending' && <span className="text-sand-800 flex items-center gap-1"><Clock className="w-4 h-4 text-sand-700" /> Retry Scheduled</span>}
                 {payment.status === 'escalated' && <span className="text-burgundy-950 flex items-center gap-1"><ShieldAlert className="w-4 h-4 text-burgundy-700" /> Escalated</span>}
                 {payment.status === 'failed' && <span className="text-dustypink-800 flex items-center gap-1"><AlertTriangle className="w-4 h-4 text-dustypink-600" /> Action Needed</span>}
+              </div>
+            </div>
+          </div>
+
+          {/* 1. Plain Customer-Facing Decline Explanation (Transparency feature) */}
+          <div className="space-y-2">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-burgundy-900 flex items-center gap-1.5 font-serif-luxury text-sm">
+              <Building2 className="w-4 h-4 text-burgundy-700" />
+              Customer-Facing Decline Explanation
+            </h4>
+
+            <div className="p-4 bg-white/90 rounded-2xl border border-sand-200 space-y-2 shadow-2xs">
+              <p className="text-xs text-burgundy-950 font-medium leading-relaxed">
+                "{payment.customer_explanation || `Your card was declined because it has expired. ${bankNotification.bank_name} requires updated card details to process this payment.`}"
+              </p>
+
+              {/* Simulated Issuing Bank Notification Status */}
+              <div className="pt-2 border-t border-sand-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px] font-mono text-sand-700">
+                <span className="flex items-center gap-1.5 text-emerald-800 font-bold">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
+                  Decline reason sent to {bankNotification.bank_name} for reference
+                </span>
+                <span className="text-sand-500">Ref: {bankNotification.reference_id}</span>
               </div>
             </div>
           </div>
@@ -185,6 +242,16 @@ export default function PaymentDetailModal({ payment, onClose, onExecuteAction }
                 >
                   <Lock className="w-3.5 h-3.5 text-burgundy-700" />
                   Requires Human Approval
+                </div>
+              ) : isProcessing ? (
+                <div className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl text-sand-500 bg-sand-200 border border-sand-300 cursor-not-allowed">
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin text-burgundy-700" />
+                  Processing Recovery (~30s)...
+                </div>
+              ) : isViewer ? (
+                <div className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl text-sand-500 bg-sand-200 border border-sand-300 cursor-not-allowed">
+                  <Lock className="w-3.5 h-3.5 text-sand-500" />
+                  View-Only Role
                 </div>
               ) : (
                 <button

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Header from './components/Header';
 import MetricCard from './components/MetricCard';
 import FailureChart from './components/FailureChart';
@@ -6,6 +6,8 @@ import AgentRulesBanner from './components/AgentRulesBanner';
 import PaymentTable from './components/PaymentTable';
 import PaymentDetailModal from './components/PaymentDetailModal';
 import AuditLogModal from './components/AuditLogModal';
+import CustomerPortalModal from './components/CustomerPortalModal';
+import LoginScreen from './components/LoginScreen';
 import { 
   AlertTriangle, 
   DollarSign, 
@@ -16,10 +18,17 @@ import {
   Bot,
   Check,
   Lock,
-  ShieldCheck
+  ShieldCheck,
+  RefreshCw
 } from 'lucide-react';
 
 export default function App() {
+  // Authentication State
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
+  const [authChecked, setAuthChecked] = useState(false);
+
+  // Application Data State
   const [payments, setPayments] = useState([]);
   const [stats, setStats] = useState(null);
   const [auditLogs, setAuditLogs] = useState([]);
@@ -27,20 +36,72 @@ export default function App() {
   const [isRecovering, setIsRecovering] = useState(false);
   const [selectedReason, setSelectedReason] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // Modals State
   const [activeModalPayment, setActiveModalPayment] = useState(null);
+  const [customerViewPayment, setCustomerViewPayment] = useState(null);
   const [isAuditLogOpen, setIsAuditLogOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
+
+  // ~30-Second Processing Map: { [paymentId]: { progress: number, secondsRemaining: number } }
+  const [processingMap, setProcessingMap] = useState({});
+  const intervalsRef = useRef({});
 
   const showToast = (msg) => {
     setToastMessage(msg);
     setTimeout(() => {
       setToastMessage(null);
-    }, 4000);
+    }, 4500);
+  };
+
+  // Restore session on mount
+  useEffect(() => {
+    const savedToken = localStorage.getItem('recover_auth_token');
+    const savedUser = localStorage.getItem('recover_auth_user');
+
+    if (savedToken && savedUser) {
+      try {
+        setToken(savedToken);
+        setUser(JSON.parse(savedUser));
+      } catch (err) {
+        localStorage.removeItem('recover_auth_token');
+        localStorage.removeItem('recover_auth_user');
+      }
+    }
+    setAuthChecked(true);
+  }, []);
+
+  const handleLoginSuccess = (userData, sessionToken) => {
+    setUser(userData);
+    setToken(sessionToken);
+    localStorage.setItem('recover_auth_token', sessionToken);
+    localStorage.setItem('recover_auth_user', JSON.stringify(userData));
+    showToast(`Welcome back, ${userData.name}! Logged in as ${userData.role}.`);
+  };
+
+  const handleLogout = async () => {
+    try {
+      if (token) {
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      }
+    } catch (err) {
+      // ignore
+    } finally {
+      setUser(null);
+      setToken(null);
+      localStorage.removeItem('recover_auth_token');
+      localStorage.removeItem('recover_auth_user');
+      showToast('Logged out successfully.');
+    }
   };
 
   const fetchData = useCallback(async () => {
     try {
-      const res = await fetch('/api/payments');
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const res = await fetch('/api/payments', { headers });
       const data = await res.json();
       setPayments(data.payments || []);
       setStats(data.stats || null);
@@ -50,51 +111,123 @@ export default function App() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [token]);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    if (user && token) {
+      fetchData();
+    }
+  }, [user, token, fetchData]);
 
-  // Execute recovery for a single payment
-  const handleExecuteAction = async (id) => {
-    try {
-      const res = await fetch(`/api/payments/${id}/recover`, { method: 'POST' });
-      const data = await res.json();
-      if (data.payment) {
-        setPayments(prev => prev.map(p => p.id === id ? data.payment : p));
-        setStats(data.stats);
-        if (data.auditLogs) {
-          setAuditLogs(data.auditLogs);
-        }
-        showToast(`Action executed: ${data.payment.action} for ${data.payment.customer_name} ($${data.payment.amount})`);
-        
-        // Update modal if open
-        if (activeModalPayment && activeModalPayment.id === id) {
-          setActiveModalPayment(data.payment);
+  // Execute recovery for a single payment with 30-Second Processing Simulation
+  const handleExecuteAction = (id) => {
+    if (user?.role === 'Viewer') {
+      showToast('Permission Denied: Viewer role is read-only.');
+      return;
+    }
+
+    const target = payments.find(p => p.id === id);
+    if (!target || target.status !== 'failed' || target.failure_reason === 'fraud_flag') {
+      return;
+    }
+
+    if (processingMap[id]) return; // already in flight
+
+    const TOTAL_SECONDS = 30;
+    let currentSeconds = TOTAL_SECONDS;
+
+    // Initialize processing state
+    setProcessingMap(prev => ({
+      ...prev,
+      [id]: { progress: 0, secondsRemaining: TOTAL_SECONDS }
+    }));
+
+    showToast(`Processing recovery for ${target.customer_name} (~30s gateway handshake)...`);
+
+    // 1-second interval ticking down for 30s
+    const interval = setInterval(async () => {
+      currentSeconds -= 1;
+      const progressPercent = Math.round(((TOTAL_SECONDS - currentSeconds) / TOTAL_SECONDS) * 100);
+
+      if (currentSeconds > 0) {
+        setProcessingMap(prev => ({
+          ...prev,
+          [id]: { progress: progressPercent, secondsRemaining: currentSeconds }
+        }));
+      } else {
+        // 30 seconds completed -> Resolve to backend
+        clearInterval(interval);
+        delete intervalsRef.current[id];
+
+        setProcessingMap(prev => {
+          const next = { ...prev };
+          delete next[id];
+          return next;
+        });
+
+        try {
+          const headers = { 
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {})
+          };
+          const res = await fetch(`/api/payments/${id}/recover`, { method: 'POST', headers });
+          const data = await res.json();
+          if (data.payment) {
+            setPayments(prev => prev.map(p => p.id === id ? data.payment : p));
+            setStats(data.stats);
+            if (data.auditLogs) setAuditLogs(data.auditLogs);
+            
+            showToast(`✅ ${data.payment.action === 'retry_later' ? 'Scheduled retry in 3 days' : 'Successfully recovered $' + data.payment.amount.toFixed(2)} for ${data.payment.customer_name}!`);
+            
+            // Update modal if open
+            if (activeModalPayment && activeModalPayment.id === id) {
+              setActiveModalPayment(data.payment);
+            }
+          }
+        } catch (err) {
+          showToast('Error finalizing recovery transaction.');
         }
       }
-    } catch (err) {
-      console.error('Error executing action:', err);
-    }
+    }, 1000);
+
+    intervalsRef.current[id] = interval;
   };
 
-  // Run batch AI recovery agent
+  // Run batch AI recovery agent with staggered realistic queue processing
   const handleRecoverAll = async () => {
+    if (user?.role === 'Viewer') {
+      showToast('Permission Denied: Viewer role cannot trigger batch recovery.');
+      return;
+    }
+
     setIsRecovering(true);
+    showToast('Autonomous AI Recovery Agent initiated: Analyzing 30 payment signals...');
+
     try {
-      const res = await fetch('/api/payments/recover-all', { method: 'POST' });
+      // Step 1: Simulate telemetry analysis
+      await new Promise(r => setTimeout(r, 1800));
+      showToast('Step 1/3: Bank telemetry verified with issuing networks...');
+
+      // Step 2: Simulate dispatching routing retries
+      await new Promise(r => setTimeout(r, 2000));
+      showToast('Step 2/3: Dispatched 1-click update links & scheduled smart retries...');
+
+      // Step 3: Finalize batch execution on backend
+      const headers = { 
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {})
+      };
+      const res = await fetch('/api/payments/recover-all', { method: 'POST', headers });
       const data = await res.json();
+      
       if (data.payments) {
         setPayments(data.payments);
         setStats(data.stats);
-        if (data.auditLogs) {
-          setAuditLogs(data.auditLogs);
-        }
-        showToast(`AI Agent processed ${data.processedCount} payments! Recovered $${data.stats.totalRecovered.toFixed(2)}`);
+        if (data.auditLogs) setAuditLogs(data.auditLogs);
+        showToast(`🎉 AI Agent completed recovery! Recovered $${data.stats.totalRecovered.toFixed(2)} across ${data.processedCount} transactions.`);
       }
     } catch (err) {
-      console.error('Error in batch recovery:', err);
+      showToast('Error running autonomous batch recovery.');
     } finally {
       setIsRecovering(false);
     }
@@ -103,22 +236,39 @@ export default function App() {
   // Reset to seed data
   const handleReset = async () => {
     try {
-      const res = await fetch('/api/reset', { method: 'POST' });
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const res = await fetch('/api/reset', { method: 'POST', headers });
       const data = await res.json();
       if (data.payments) {
         setPayments(data.payments);
         setStats(data.stats);
-        if (data.auditLogs) {
-          setAuditLogs(data.auditLogs);
-        }
+        if (data.auditLogs) setAuditLogs(data.auditLogs);
         setSelectedReason('all');
         setSearchQuery('');
+        setProcessingMap({});
         showToast('Demo dataset reset to initial 30 seed records.');
       }
     } catch (err) {
-      console.error('Error resetting data:', err);
+      showToast('Error resetting demo dataset.');
     }
   };
+
+  // Clean up any running intervals on unmount
+  useEffect(() => {
+    return () => {
+      Object.values(intervalsRef.current).forEach(clearInterval);
+    };
+  }, []);
+
+  // 1. If auth not checked yet, show quick loader
+  if (!authChecked) {
+    return null;
+  }
+
+  // 2. Gate entire dashboard behind LoginScreen
+  if (!user || !token) {
+    return <LoginScreen onLoginSuccess={handleLoginSuccess} />;
+  }
 
   if (loading) {
     return (
@@ -152,13 +302,15 @@ export default function App() {
         </div>
       )}
 
-      {/* Navigation Header */}
+      {/* Navigation Header with User Profile & Logout */}
       <Header
         stats={stats}
         onRecoverAll={handleRecoverAll}
         onReset={handleReset}
         isRecovering={isRecovering}
         onOpenAuditLog={() => setIsAuditLogOpen(true)}
+        user={user}
+        onLogout={handleLogout}
       />
 
       {/* Main Dashboard Content */}
@@ -257,11 +409,14 @@ export default function App() {
             stats={stats}
             onExecuteAction={handleExecuteAction}
             onSelectPayment={setActiveModalPayment}
+            onOpenCustomerView={setCustomerViewPayment}
             selectedReason={selectedReason}
             onSelectReason={setSelectedReason}
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
             onOpenAuditLog={() => setIsAuditLogOpen(true)}
+            processingMap={processingMap}
+            userRole={user?.role || 'Admin'}
           />
         </div>
 
@@ -273,6 +428,18 @@ export default function App() {
           payment={activeModalPayment}
           onClose={() => setActiveModalPayment(null)}
           onExecuteAction={handleExecuteAction}
+          onOpenCustomerView={setCustomerViewPayment}
+          isProcessing={!!processingMap[activeModalPayment.id]}
+          userRole={user?.role || 'Admin'}
+        />
+      )}
+
+      {/* Customer Portal Preview Modal */}
+      {customerViewPayment && (
+        <CustomerPortalModal
+          payment={customerViewPayment}
+          onClose={() => setCustomerViewPayment(null)}
+          onSimulateCustomerUpdate={handleExecuteAction}
         />
       )}
 

@@ -3,6 +3,25 @@ const path = require('path');
 
 const SEED_DATA_PATH = path.join(__dirname, '..', 'data', 'failed_payments.json');
 
+const MOCK_ISSUING_BANKS = [
+  'JPMorgan Chase Bank, N.A.',
+  'Citibank, N.A.',
+  'Bank of America, N.A.',
+  'Wells Fargo Bank, N.A.',
+  'Barclays Bank UK PLC',
+  'Capital One, N.A.',
+  'HSBC Bank USA, N.A.',
+  'TD Bank, N.A.'
+];
+
+function getIssuingBank(id, cardLast4) {
+  const safeId = id || 'pay_default';
+  const digits = (cardLast4 || '').replace(/\D/g, '');
+  const num = digits.length > 0 ? parseInt(digits, 10) : 4242;
+  const hash = safeId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) + num;
+  return MOCK_ISSUING_BANKS[Math.abs(hash) % MOCK_ISSUING_BANKS.length];
+}
+
 /**
  * Intelligent Action Decision Engine for Revenue Recovery
  * @param {Object} payment - Failed payment record
@@ -14,14 +33,32 @@ function decideAction(payment) {
   const amount = payment.amount || 0;
   const name = payment.customer_name || 'Valued Customer';
   const last4 = payment.card_last4 || '••••';
+  const bankName = payment.bank_name || getIssuingBank(payment.id, last4);
+  const paymentDate = payment.date || new Date().toISOString();
+
+  // Plain customer-facing explanations & simulated bank notifications
+  let customerExplanation = '';
+  let customerNextStep = '';
 
   switch (reason) {
     case 'expired_card': {
+      customerExplanation = `Your card was declined because it has expired. ${bankName} requires updated expiration and CVV details to process this payment.`;
+      customerNextStep = 'Please update your card payment details via our secure link to avoid interruption to your subscription.';
       const loyaltyDesc = history > 10 ? `high-LTV customer (${history} successful payments)` : `customer with ${history} past payments`;
       return {
         action: 'send_email',
         message: `Hi ${name}, your $${amount.toFixed(2)} payment failed due to an expired card ending in ${last4}. Please update your billing details to maintain uninterrupted access.`,
         reasoning: `Card expired. Customer is a ${loyaltyDesc}. Autonomous email dispatched with secure 1-click update link.`,
+        customer_explanation: customerExplanation,
+        customer_next_step: customerNextStep,
+        bank_name: bankName,
+        bank_notification: {
+          bank_name: bankName,
+          status: 'Notified',
+          event: 'Decline reason and card update request registered',
+          reference_id: `BNK-DECL-EXP-${(payment.id || '00').toUpperCase()}`,
+          notified_at: paymentDate
+        },
         risk_signal: null,
         retryInDays: null,
         simulatedOutcome: 'recovered', // customer receives email and updates card
@@ -30,10 +67,22 @@ function decideAction(payment) {
     }
 
     case 'insufficient_funds': {
+      customerExplanation = `Your payment of $${amount.toFixed(2)} could not be processed due to a temporary balance constraint reported by ${bankName}.`;
+      customerNextStep = `No manual action required. An automated smart retry is scheduled in 3 days aligned with typical banking settlement cycles.`;
       return {
         action: 'retry_later',
         message: `Temporary insufficient balance detected for $${amount.toFixed(2)}. Automated retry scheduled in 3 days.`,
         reasoning: `Insufficient funds flagged. Immediate retry causes churn; AI scheduled intelligent retry in 3 days aligned with typical pay cycle (${history} historical payments).`,
+        customer_explanation: customerExplanation,
+        customer_next_step: customerNextStep,
+        bank_name: bankName,
+        bank_notification: {
+          bank_name: bankName,
+          status: 'Notified',
+          event: `Decline reason registered with ${bankName}; 72h retry window reserved`,
+          reference_id: `BNK-DECL-NSF-${(payment.id || '00').toUpperCase()}`,
+          notified_at: paymentDate
+        },
         risk_signal: null,
         retryInDays: 3,
         simulatedOutcome: 'pending', // scheduled for later
@@ -42,10 +91,22 @@ function decideAction(payment) {
     }
 
     case 'bank_decline': {
+      customerExplanation = `Your issuing bank (${bankName}) returned a temporary network decline or rate limit during transaction processing.`;
+      customerNextStep = `Our autonomous gateway routing system has queued an instant smart re-attempt using optimized network routing.`;
       return {
         action: 'retry_now',
         message: `Instant retry executed for $${amount.toFixed(2)} with optimized gateway routing.`,
         reasoning: `Transient issuer/network decline detected. Executed immediate smart retry with alternative routing to resolve soft decline.`,
+        customer_explanation: customerExplanation,
+        customer_next_step: customerNextStep,
+        bank_name: bankName,
+        bank_notification: {
+          bank_name: bankName,
+          status: 'Notified',
+          event: `Network decline telemetry transmitted to ${bankName}; alternative routing active`,
+          reference_id: `BNK-DECL-NET-${(payment.id || '00').toUpperCase()}`,
+          notified_at: paymentDate
+        },
         risk_signal: null,
         retryInDays: 0,
         simulatedOutcome: 'recovered', // soft decline resolved upon instant re-attempt
@@ -57,10 +118,22 @@ function decideAction(payment) {
       const riskSignal = history === 0
         ? "New account, zero payment history, high transaction amount relative to plan tier"
         : "Unusual velocity, geographic mismatch with card issuer network";
+      customerExplanation = `Your transaction was flagged by automated security protocols at ${bankName} and our risk engine for additional identity verification.`;
+      customerNextStep = `Our compliance and fraud team has been notified. Automated charges have been halted to protect your account security.`;
       return {
         action: 'escalate_human',
         message: `Risk flag raised for $${amount.toFixed(2)}. Automated retries blocked. Escalated to Fraud & Compliance team.`,
         reasoning: `High risk score (${history === 0 ? 'new account with zero past payments' : 'abnormal velocity'}). Automated recovery halted to avoid chargeback penalties and merchant dispute fees.`,
+        customer_explanation: customerExplanation,
+        customer_next_step: customerNextStep,
+        bank_name: bankName,
+        bank_notification: {
+          bank_name: bankName,
+          status: 'Notified',
+          event: `Suspicious activity lock reported to ${bankName} fraud prevention network`,
+          reference_id: `BNK-RISK-FLG-${(payment.id || '00').toUpperCase()}`,
+          notified_at: paymentDate
+        },
         risk_signal: riskSignal,
         retryInDays: null,
         simulatedOutcome: 'escalated', // requires manual inspection
@@ -73,6 +146,16 @@ function decideAction(payment) {
         action: 'escalate_human',
         message: `Unclassified payment failure for $${amount.toFixed(2)}.`,
         reasoning: `Unknown failure reason '${reason}'. Escalated for manual review.`,
+        customer_explanation: `Your payment could not be processed. Please check with ${bankName} or contact support.`,
+        customer_next_step: `Escalated to our support specialists for manual resolution.`,
+        bank_name: bankName,
+        bank_notification: {
+          bank_name: bankName,
+          status: 'Notified',
+          event: `Decline record sent to ${bankName}`,
+          reference_id: `BNK-GEN-${(payment.id || '00').toUpperCase()}`,
+          notified_at: paymentDate
+        },
         risk_signal: "Unclassified transaction pattern",
         retryInDays: null,
         simulatedOutcome: 'escalated',
@@ -95,7 +178,8 @@ class RecoveryStore {
       this.auditLogs = [];
       
       this.payments = seed.map(item => {
-        const decision = decideAction(item);
+        const bankName = getIssuingBank(item.id, item.card_last4);
+        const decision = decideAction({ ...item, bank_name: bankName });
         
         // Initial ingest audit log entry
         this.auditLogs.push({
@@ -111,16 +195,21 @@ class RecoveryStore {
                        decision.action === 'retry_now' ? 'Instant Network Retry Evaluated' : 'Fraud Escalation Ticket Opened',
           outcome: 'Initial Detection',
           outcomeStatus: 'detected',
+          bank_name: bankName,
           reasoning: decision.reasoning,
           immutableHash: Buffer.from(`${item.id}:${item.amount}:${decision.action}`).toString('base64').substring(0, 12)
         });
 
         return {
           ...item,
+          bank_name: bankName,
           status: 'failed', // failed | recovered | pending | escalated
           action: decision.action,
           message: decision.message,
           reasoning: decision.reasoning,
+          customer_explanation: decision.customer_explanation,
+          customer_next_step: decision.customer_next_step,
+          bank_notification: decision.bank_notification,
           risk_signal: decision.risk_signal,
           retryInDays: decision.retryInDays,
           simulatedOutcome: decision.simulatedOutcome,
@@ -172,12 +261,12 @@ class RecoveryStore {
       outcomeStatus = 'recovered';
     } else if (payment.action === 'retry_now') {
       payment.status = 'recovered';
-      payment.execution_log = `[${now}] Executed instant network retry via secondary gateway. Bank approval received. $${payment.amount} recovered.`;
+      payment.execution_log = `[${now}] Executed instant network retry via secondary gateway. Bank approval received from ${payment.bank_name}. $${payment.amount} recovered.`;
       outcomeText = `Recovered ($${payment.amount.toFixed(2)}) via Instant Gateway Retry`;
       outcomeStatus = 'recovered';
     } else if (payment.action === 'retry_later') {
       payment.status = 'pending';
-      payment.execution_log = `[${now}] Smart retry scheduled for 3 days from now (${new Date(Date.now() + 3*86400000).toLocaleDateString()}). Notification queued.`;
+      payment.execution_log = `[${now}] Smart retry scheduled for 3 days from now (${new Date(Date.now() + 3*86400000).toLocaleDateString()}). Notification queued with ${payment.bank_name}.`;
       outcomeText = `Pending Retry in 3 Days`;
       outcomeStatus = 'pending';
     } else if (payment.action === 'escalate_human') {
@@ -201,6 +290,7 @@ class RecoveryStore {
                    payment.action === 'retry_now' ? 'Instant Gateway Retry' : 'Compliance Escalation Ticket',
       outcome: outcomeText,
       outcomeStatus: outcomeStatus,
+      bank_name: payment.bank_name,
       reasoning: payment.reasoning,
       immutableHash: Buffer.from(`${payment.id}:${now}:${outcomeStatus}`).toString('base64').substring(0, 12)
     });
@@ -294,5 +384,6 @@ const store = new RecoveryStore();
 
 module.exports = {
   decideAction,
-  store
+  store,
+  getIssuingBank
 };
