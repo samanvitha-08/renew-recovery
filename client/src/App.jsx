@@ -7,6 +7,7 @@ import PaymentTable from './components/PaymentTable';
 import PaymentDetailModal from './components/PaymentDetailModal';
 import AuditLogModal from './components/AuditLogModal';
 import CustomerPortalModal from './components/CustomerPortalModal';
+import WorkerProfileModal from './components/WorkerProfileModal';
 import LoginScreen from './components/LoginScreen';
 import { 
   AlertTriangle, 
@@ -41,6 +42,7 @@ export default function App() {
   const [activeModalPayment, setActiveModalPayment] = useState(null);
   const [customerViewPayment, setCustomerViewPayment] = useState(null);
   const [isAuditLogOpen, setIsAuditLogOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
 
   // ~30-Second Processing Map: { [paymentId]: { progress: number, secondsRemaining: number } }
@@ -309,6 +311,7 @@ export default function App() {
         onReset={handleReset}
         isRecovering={isRecovering}
         onOpenAuditLog={() => setIsAuditLogOpen(true)}
+        onOpenProfile={() => setIsProfileOpen(true)}
         user={user}
         onLogout={handleLogout}
       />
@@ -322,7 +325,7 @@ export default function App() {
           <div className="absolute -left-20 -bottom-20 w-72 h-72 bg-sand-200/50 rounded-full blur-3xl pointer-events-none" />
 
           <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-            <div className="max-w-2xl space-y-2.5">
+            <div className="max-w-3xl space-y-2.5">
               <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-dustypink-100 text-burgundy-800 border border-dustypink-300 text-xs font-bold font-sans">
                 <Sparkles className="w-3.5 h-3.5 text-burgundy-600" />
                 Autonomous Revenue Recovery
@@ -333,19 +336,6 @@ export default function App() {
               <p className="text-sm text-sand-800 leading-relaxed font-medium">
                 Recover monitors failed subscription transactions, predicts customer payment behavior, and executes intelligent automated recovery workflows with precision.
               </p>
-            </div>
-
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              <div className="p-5 rounded-2xl bg-white/80 border border-sand-300/80 text-center min-w-[160px] shadow-sm">
-                <div className="text-[11px] uppercase tracking-wider text-sand-700 font-bold">System Status</div>
-                <div className="text-sm font-bold text-burgundy-800 flex items-center justify-center gap-2 mt-1.5 font-serif-luxury">
-                  <span className="w-2.5 h-2.5 rounded-full bg-burgundy-600 animate-pulse"></span>
-                  Active Monitoring
-                </div>
-                <div className="text-[10px] text-sand-600 font-medium mt-1">
-                  🔒 SOC2 Audit Active
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -451,6 +441,16 @@ export default function App() {
         />
       )}
 
+      {/* Worker Profile & Performance Modal */}
+      {isProfileOpen && (
+        <WorkerProfileModal
+          user={user}
+          onClose={() => setIsProfileOpen(false)}
+          payments={payments}
+          auditLogs={auditLogs}
+        />
+      )}
+
       {/* Clean Minimal Footer */}
       <footer className="mt-auto border-t border-sand-300/80 bg-creme-50/70 py-6 text-xs text-sand-700 font-medium">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
@@ -458,9 +458,6 @@ export default function App() {
             <span className="font-serif-luxury font-bold text-sm text-burgundy-950">Recover</span>
             <span className="mx-2 text-sand-400">•</span>
             <span className="text-sand-700">Autonomous Revenue Recovery for Payment Platforms</span>
-          </div>
-          <div className="inline-flex items-center gap-1.5 text-sand-600 bg-sand-100/80 px-3 py-1 rounded-full border border-sand-200/80 font-mono text-[11px]">
-            <span>🔒 Data encrypted in transit & at rest</span>
           </div>
         </div>
       </footer>

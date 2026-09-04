@@ -17,6 +17,7 @@ export default function Header({
   isRecovering, 
   stats,
   onOpenAuditLog,
+  onOpenProfile,
   user,
   onLogout
 }) {
@@ -28,7 +29,7 @@ export default function Header({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           
-          {/* Logo, Title & Security Badge */}
+          {/* Logo & Title */}
           <div className="flex items-center space-x-3.5">
             <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-burgundy-700 via-burgundy-600 to-dustypink-400 p-[1.5px] shadow-md shadow-burgundy-900/15 transition-transform hover:scale-105 duration-300">
               <div className="w-full h-full bg-creme-50 rounded-[14px] flex items-center justify-center">
@@ -43,12 +44,6 @@ export default function Header({
                     AI Agent
                   </span>
                 </h1>
-                
-                {/* Security / Compliance Badge in header */}
-                <div className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-sand-200/80 text-burgundy-900 border border-sand-300 text-[11px] font-medium font-sans">
-                  <Lock className="w-3 h-3 text-burgundy-700" />
-                  <span>🔒 SOC2-style audit logging active</span>
-                </div>
               </div>
 
               <p className="text-xs text-sand-700 flex items-center gap-2 mt-0.5 font-medium">
@@ -61,14 +56,18 @@ export default function Header({
           {/* User Profile & Action Controls */}
           <div className="flex items-center space-x-2.5 flex-wrap gap-y-2">
             
-            {/* Logged in User Badge */}
+            {/* Logged in User Profile & Performance Trigger Button */}
             {user && (
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/80 border border-sand-300/80 shadow-2xs">
-                <div className="w-6 h-6 rounded-lg bg-burgundy-100 text-burgundy-800 flex items-center justify-center font-bold text-[11px]">
+              <button
+                onClick={onOpenProfile}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/90 hover:bg-white border border-sand-300/80 hover:border-burgundy-400 shadow-2xs hover:shadow transition-all group active:scale-95 text-left cursor-pointer"
+                title="View Operator Profile & Shift Performance Metrics"
+              >
+                <div className="w-6 h-6 rounded-lg bg-burgundy-100 text-burgundy-800 group-hover:bg-burgundy-800 group-hover:text-creme-50 flex items-center justify-center font-bold text-[11px] transition-colors">
                   {user.name?.charAt(0) || 'U'}
                 </div>
                 <div className="text-left">
-                  <span className="block text-[11px] font-bold text-burgundy-950 leading-tight">
+                  <span className="block text-[11px] font-bold text-burgundy-950 group-hover:text-burgundy-800 transition-colors leading-tight">
                     {user.name || user.username}
                   </span>
                   <span className={`inline-block text-[9px] font-bold px-1.5 py-0.2 rounded font-mono ${
@@ -79,8 +78,18 @@ export default function Header({
                     {user.role} Role
                   </span>
                 </div>
-              </div>
+              </button>
             )}
+
+            {/* Performance View Trigger Button */}
+            <button
+              onClick={onOpenProfile}
+              className="inline-flex items-center px-3 py-2 text-xs font-semibold rounded-xl text-burgundy-900 bg-sand-100 hover:bg-sand-200 border border-sand-300/80 transition-all duration-200 shadow-2xs hover:shadow active:scale-95"
+              title="View your recovery impact, success rate & stats"
+            >
+              <User className="w-3.5 h-3.5 mr-1.5 text-burgundy-700" />
+              Performance
+            </button>
 
             {/* Audit Log Trigger Button */}
             <button
