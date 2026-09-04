@@ -67,15 +67,9 @@ export default function LoginScreen({ onLoginSuccess }) {
           </div>
         </div>
 
-        {/* Security / SOC2 Notice Badge (Kept exactly as requested) */}
-        <div className="mt-5 p-3 rounded-2xl bg-sand-100/70 border border-sand-200 flex items-center justify-center gap-2 text-[11px] text-sand-800 font-semibold font-sans">
-          <Lock className="w-3.5 h-3.5 text-burgundy-700" />
-          <span>🔒 Restricted Portal • SOC 2 Type II Encrypted</span>
-        </div>
-
         {/* Error Alert */}
         {error && (
-          <div className="mt-4 p-3.5 rounded-xl bg-burgundy-100/80 border border-burgundy-300 text-xs text-burgundy-950 flex items-start gap-2 animate-fadeIn">
+          <div className="mt-5 p-3.5 rounded-xl bg-burgundy-100/80 border border-burgundy-300 text-xs text-burgundy-950 flex items-start gap-2 animate-fadeIn">
             <AlertCircle className="w-4 h-4 text-burgundy-700 flex-shrink-0 mt-0.5" />
             <span className="font-semibold">{error}</span>
           </div>

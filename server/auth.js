@@ -4,14 +4,16 @@ const crypto = require('crypto');
 const USERS = [
   {
     username: 'samanvitha@recover.demo',
-    passwords: ['Recover@2026'],
+    aliases: ['pasupulasamanvitha@gmail.com', 'samanvitha', 'samanvitha@recover.demo'],
+    passwords: ['Recover@2026', 'demo pass', 'demopass', 'admin123', 'password'],
     name: 'Samanvitha',
-    email: 'samanvitha@recover.demo',
+    email: 'pasupulasamanvitha@gmail.com',
     role: 'Admin', // Full access
     permissions: ['read', 'execute', 'batch_execute', 'reset', 'audit_export']
   },
   {
     username: 'admin',
+    aliases: ['admin@recover.demo', 'alex'],
     passwords: ['Recover@2026', 'demo pass', 'demopass', 'admin123', 'password'],
     name: 'Alex Rivera',
     email: 'admin@recover.demo',
@@ -20,6 +22,7 @@ const USERS = [
   },
   {
     username: 'ops1',
+    aliases: ['ops1@recover.demo', 'ops'],
     passwords: ['Recover@2026', 'demo pass', 'demopass', 'ops123', 'password'],
     name: 'Taylor Kim',
     email: 'ops1@recover.demo',
@@ -28,6 +31,7 @@ const USERS = [
   },
   {
     username: 'viewer',
+    aliases: ['viewer@recover.demo'],
     passwords: ['Recover@2026', 'demo pass', 'demopass', 'viewer123', 'password'],
     name: 'Jordan Lee',
     email: 'viewer@recover.demo',
@@ -47,7 +51,11 @@ function authenticate(username, password) {
   const cleanUser = username.trim().toLowerCase();
   const cleanPass = password.trim();
 
-  const user = USERS.find(u => u.username.toLowerCase() === cleanUser);
+  const user = USERS.find(u => 
+    u.username.toLowerCase() === cleanUser ||
+    (u.aliases && u.aliases.some(a => a.toLowerCase() === cleanUser)) ||
+    (u.email && u.email.toLowerCase() === cleanUser)
+  );
   if (!user) {
     return { success: false, error: 'Invalid credentials. User not found.' };
   }

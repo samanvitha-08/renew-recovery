@@ -49,6 +49,10 @@ const primaryLogin = authenticate('samanvitha@recover.demo', 'Recover@2026');
 assert.strictEqual(primaryLogin.success, true, 'Primary login succeeds');
 assert.strictEqual(primaryLogin.user.role, 'Admin', 'Primary user has Admin role');
 
+const gmailLogin = authenticate('pasupulasamanvitha@gmail.com', 'Recover@2026');
+assert.strictEqual(gmailLogin.success, true, 'Gmail alias login succeeds');
+assert.strictEqual(gmailLogin.user.role, 'Admin', 'Gmail alias has Admin role');
+
 const adminLogin = authenticate('admin', 'Recover@2026');
 assert.strictEqual(adminLogin.success, true, 'Admin login succeeds');
 assert.strictEqual(adminLogin.user.role, 'Admin', 'Admin role assigned');
