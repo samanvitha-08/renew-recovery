@@ -293,11 +293,11 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-creme-100 flex flex-col items-center justify-center text-sand-800 space-y-4">
-        <div className="w-14 h-14 rounded-3xl bg-dustypink-100 border border-dustypink-300 flex items-center justify-center animate-pulse shadow-soft">
-          <Bot className="w-7 h-7 text-burgundy-700" />
+      <div className="min-h-screen bg-creme-100 dark:bg-burgundy-950 flex flex-col items-center justify-center text-sand-800 dark:text-sand-300 space-y-4">
+        <div className="w-14 h-14 rounded-3xl bg-dustypink-100 dark:bg-burgundy-900 border border-dustypink-300 dark:border-burgundy-800 flex items-center justify-center animate-pulse shadow-soft">
+          <Bot className="w-7 h-7 text-burgundy-700 dark:text-dustypink-300" />
         </div>
-        <div className="text-base font-bold text-burgundy-950 font-serif-luxury">Initializing Recover AI Engine...</div>
+        <div className="text-base font-bold text-burgundy-950 dark:text-creme-50 font-serif-luxury">Initializing Recover AI Engine...</div>
       </div>
     );
   }
@@ -309,12 +309,12 @@ export default function App() {
   const recoveryRate = stats?.recoveryRate || 0;
 
   return (
-    <div className="min-h-screen bg-creme-100 text-burgundy-950 flex selection:bg-dustypink-200 selection:text-burgundy-950">
+    <div className="min-h-screen bg-creme-100 dark:bg-burgundy-950 text-burgundy-950 dark:text-creme-50 flex selection:bg-dustypink-200 dark:selection:bg-dustypink-900 selection:text-burgundy-950 dark:selection:text-creme-50">
       
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 animate-bounce-short">
-          <div className="flex items-center space-x-3 px-5 py-3.5 bg-burgundy-950 border border-dustypink-400 text-creme-50 rounded-2xl shadow-soft-xl shadow-burgundy-950/40">
+          <div className="flex items-center space-x-3 px-5 py-3.5 bg-burgundy-950 dark:bg-burgundy-900 border border-dustypink-400 dark:border-dustypink-500 text-creme-50 rounded-2xl shadow-soft-xl shadow-burgundy-950/40">
             <div className="p-1.5 rounded-full bg-dustypink-300/20 text-dustypink-200">
               <Check className="w-4 h-4" />
             </div>
@@ -351,20 +351,20 @@ export default function App() {
         <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
           
           {/* Hero Section Banner */}
-          <div className="relative overflow-hidden rounded-3xl border border-sand-300/80 bg-gradient-to-br from-creme-50 via-sand-50/90 to-dustypink-50/70 p-7 sm:p-9 shadow-soft-lg">
-            <div className="absolute -right-20 -top-20 w-72 h-72 bg-dustypink-200/40 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -left-20 -bottom-20 w-72 h-72 bg-sand-200/50 rounded-full blur-3xl pointer-events-none" />
+          <div className="relative overflow-hidden rounded-3xl border border-sand-300/80 dark:border-burgundy-800/80 bg-gradient-to-br from-creme-50 via-sand-50/90 to-dustypink-50/70 dark:from-burgundy-900/80 dark:via-burgundy-900/60 dark:to-burgundy-950/80 p-7 sm:p-9 shadow-soft-lg">
+            <div className="absolute -right-20 -top-20 w-72 h-72 bg-dustypink-200/40 dark:bg-dustypink-900/20 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -left-20 -bottom-20 w-72 h-72 bg-sand-200/50 dark:bg-burgundy-950/40 rounded-full blur-3xl pointer-events-none" />
 
             <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
               <div className="max-w-3xl space-y-2.5">
-                <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-dustypink-100 text-burgundy-800 border border-dustypink-300 text-xs font-bold font-sans">
-                  <Sparkles className="w-3.5 h-3.5 text-burgundy-600" />
+                <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-dustypink-100 dark:bg-burgundy-800/80 text-burgundy-800 dark:text-dustypink-200 border border-dustypink-300 dark:border-burgundy-700 text-xs font-bold font-sans">
+                  <Sparkles className="w-3.5 h-3.5 text-burgundy-600 dark:text-dustypink-300" />
                   Autonomous Revenue Recovery
                 </div>
-                <h2 className="text-2xl sm:text-4xl font-bold font-serif-luxury tracking-tight text-burgundy-950 leading-tight">
+                <h2 className="text-2xl sm:text-4xl font-bold font-serif-luxury tracking-tight text-burgundy-950 dark:text-creme-50 leading-tight">
                   Turn Involuntary Churn into Recovered Revenue
                 </h2>
-                <p className="text-sm text-sand-800 leading-relaxed font-medium">
+                <p className="text-sm text-sand-800 dark:text-sand-300 leading-relaxed font-medium">
                   Recover monitors failed subscription transactions, predicts customer payment behavior, and executes intelligent automated recovery workflows with precision.
                 </p>
               </div>
@@ -442,12 +442,12 @@ export default function App() {
         </main>
 
         {/* Clean Minimal Footer */}
-        <footer className="mt-auto border-t border-sand-300/80 bg-creme-50/70 py-6 text-xs text-sand-700 font-medium">
+        <footer className="mt-auto border-t border-sand-300/80 dark:border-burgundy-900/80 bg-creme-50/70 dark:bg-burgundy-950/90 py-6 text-xs text-sand-700 dark:text-sand-400 font-medium">
           <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
             <div>
-              <span className="font-serif-luxury font-bold text-sm text-burgundy-950">Recover</span>
-              <span className="mx-2 text-sand-400">•</span>
-              <span className="text-sand-700">Autonomous Revenue Recovery for Payment Platforms</span>
+              <span className="font-serif-luxury font-bold text-sm text-burgundy-950 dark:text-creme-50">Recover</span>
+              <span className="mx-2 text-sand-400 dark:text-burgundy-700">•</span>
+              <span className="text-sand-700 dark:text-sand-300">Autonomous Revenue Recovery for Payment Platforms</span>
             </div>
           </div>
         </footer>

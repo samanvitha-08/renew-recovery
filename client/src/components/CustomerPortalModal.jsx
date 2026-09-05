@@ -44,35 +44,35 @@ export default function CustomerPortalModal({ payment, onClose, onSimulateCustom
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-burgundy-950/75 backdrop-blur-md animate-fadeIn">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-burgundy-950/75 dark:bg-black/80 backdrop-blur-md animate-fadeIn">
       <div 
-        className="bg-creme-50 border border-sand-300 rounded-3xl w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-2xl relative"
+        className="bg-creme-50 dark:bg-burgundy-950 border border-sand-300 dark:border-burgundy-800 rounded-3xl w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-2xl relative"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Customer Portal Top Banner */}
-        <div className="p-6 sm:p-7 border-b border-sand-200 bg-gradient-to-r from-sand-100 via-creme-100 to-dustypink-100 flex items-start justify-between">
+        <div className="p-6 sm:p-7 border-b border-sand-200 dark:border-burgundy-800 bg-gradient-to-r from-sand-100 via-creme-100 to-dustypink-100 dark:from-burgundy-900 dark:via-burgundy-900/90 dark:to-burgundy-950 flex items-start justify-between">
           <div className="flex items-center space-x-3.5">
-            <div className="p-3 rounded-2xl bg-burgundy-800 text-creme-50 shadow-sm">
+            <div className="p-3 rounded-2xl bg-burgundy-800 dark:bg-burgundy-900 text-creme-50 shadow-sm border border-burgundy-900 dark:border-burgundy-700">
               <CreditCard className="w-6 h-6 text-dustypink-200" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-xl font-bold font-serif-luxury text-burgundy-950">
+                <h3 className="text-xl font-bold font-serif-luxury text-burgundy-950 dark:text-creme-50">
                   Customer Billing Notification
                 </h3>
-                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-sand-200 text-burgundy-900 border border-sand-300">
+                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-sand-200 dark:bg-burgundy-800 text-burgundy-900 dark:text-dustypink-200 border border-sand-300 dark:border-burgundy-700">
                   Customer View
                 </span>
               </div>
-              <p className="text-xs text-sand-700 mt-0.5 font-medium">
-                Recipient: <strong className="text-burgundy-950">{payment.customer_name}</strong> • Plan: {payment.plan_name || 'Subscription'}
+              <p className="text-xs text-sand-700 dark:text-sand-300 mt-0.5 font-medium">
+                Recipient: <strong className="text-burgundy-950 dark:text-creme-50">{payment.customer_name}</strong> • Plan: {payment.plan_name || 'Subscription'}
               </p>
             </div>
           </div>
 
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-sand-600 hover:text-burgundy-950 hover:bg-sand-200/80 transition-colors"
+            className="p-2 rounded-xl text-sand-600 dark:text-sand-400 hover:text-burgundy-950 dark:hover:text-creme-50 hover:bg-sand-200/80 dark:hover:bg-burgundy-800 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -82,18 +82,18 @@ export default function CustomerPortalModal({ payment, onClose, onSimulateCustom
         <div className="p-6 sm:p-7 space-y-6">
           
           {/* Payment Amount Alert Header */}
-          <div className="p-4 rounded-2xl bg-white/90 border border-dustypink-300/80 shadow-soft flex items-center justify-between">
+          <div className="p-4 rounded-2xl bg-white/90 dark:bg-burgundy-900/60 border border-dustypink-300/80 dark:border-burgundy-700 shadow-soft flex items-center justify-between">
             <div>
-              <span className="text-[11px] font-bold text-sand-700 uppercase tracking-wider">Unsuccessful Transaction</span>
-              <div className="text-xl font-bold font-mono text-burgundy-950 mt-0.5">
-                ${payment.amount?.toFixed(2)} <span className="text-xs font-normal text-sand-600">USD</span>
+              <span className="text-[11px] font-bold text-sand-700 dark:text-sand-400 uppercase tracking-wider">Unsuccessful Transaction</span>
+              <div className="text-xl font-bold font-mono text-burgundy-950 dark:text-creme-50 mt-0.5">
+                ${payment.amount?.toFixed(2)} <span className="text-xs font-normal text-sand-600 dark:text-sand-400">USD</span>
               </div>
             </div>
             <div className="text-right">
-              <span className="text-[10px] font-mono bg-dustypink-100 text-dustypink-800 px-2.5 py-1 rounded-full font-bold border border-dustypink-300">
+              <span className="text-[10px] font-mono bg-dustypink-100 dark:bg-burgundy-800 text-dustypink-800 dark:text-dustypink-200 px-2.5 py-1 rounded-full font-bold border border-dustypink-300 dark:border-burgundy-700">
                 Payment Failed
               </span>
-              <div className="text-[11px] text-sand-600 font-mono mt-1">
+              <div className="text-[11px] text-sand-600 dark:text-sand-400 font-mono mt-1">
                 Card ending in ****{payment.card_last4 || '••••'}
               </div>
             </div>
@@ -101,13 +101,13 @@ export default function CustomerPortalModal({ payment, onClose, onSimulateCustom
 
           {/* 1. Plain Customer-Facing Decline Explanation */}
           <div className="space-y-2">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-burgundy-950 flex items-center gap-1.5 font-serif-luxury text-sm">
-              <AlertCircle className="w-4 h-4 text-burgundy-700" />
+            <h4 className="text-xs font-bold uppercase tracking-wider text-burgundy-950 dark:text-sand-200 flex items-center gap-1.5 font-serif-luxury text-sm">
+              <AlertCircle className="w-4 h-4 text-burgundy-700 dark:text-dustypink-400" />
               Why Was Your Payment Declined?
             </h4>
 
-            <div className="p-4 rounded-2xl bg-sand-100/70 border border-sand-200 text-xs text-burgundy-950 leading-relaxed font-medium">
-              <p className="font-semibold text-burgundy-900">
+            <div className="p-4 rounded-2xl bg-sand-100/70 dark:bg-burgundy-900/40 border border-sand-200 dark:border-burgundy-800 text-xs text-burgundy-950 dark:text-sand-200 leading-relaxed font-medium">
+              <p className="font-semibold text-burgundy-900 dark:text-creme-50">
                 {payment.customer_explanation || `Your card was declined because it has expired. ${bankNotification.bank_name} requires updated card details to process this payment.`}
               </p>
             </div>
@@ -115,19 +115,19 @@ export default function CustomerPortalModal({ payment, onClose, onSimulateCustom
 
           {/* 2. What is being done about it */}
           <div className="space-y-2">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-burgundy-950 flex items-center gap-1.5 font-serif-luxury text-sm">
-              <Clock className="w-4 h-4 text-burgundy-700" />
+            <h4 className="text-xs font-bold uppercase tracking-wider text-burgundy-950 dark:text-sand-200 flex items-center gap-1.5 font-serif-luxury text-sm">
+              <Clock className="w-4 h-4 text-burgundy-700 dark:text-dustypink-400" />
               Next Steps & Recovery Status
             </h4>
 
-            <div className="p-4 rounded-2xl bg-creme-100/90 border border-sand-200 text-xs text-sand-800 leading-relaxed space-y-2">
-              <p className="font-medium text-burgundy-950">
+            <div className="p-4 rounded-2xl bg-creme-100/90 dark:bg-burgundy-900/50 border border-sand-200 dark:border-burgundy-800 text-xs text-sand-800 dark:text-sand-300 leading-relaxed space-y-2">
+              <p className="font-medium text-burgundy-950 dark:text-creme-50">
                 {payment.customer_next_step || 'Please update your card payment details via our secure link to avoid interruption to your subscription.'}
               </p>
               
-              <div className="pt-2 border-t border-sand-200/70 flex items-center justify-between text-[11px] font-mono text-sand-700">
+              <div className="pt-2 border-t border-sand-200/70 dark:border-burgundy-800/60 flex items-center justify-between text-[11px] font-mono text-sand-700 dark:text-sand-400">
                 <span>Autonomous Policy:</span>
-                <span className="font-bold text-burgundy-900 bg-sand-200/80 px-2 py-0.5 rounded">
+                <span className="font-bold text-burgundy-900 dark:text-dustypink-200 bg-sand-200/80 dark:bg-burgundy-800 px-2 py-0.5 rounded">
                   {payment.action === 'send_email' ? 'Update Email Dispatched' :
                    payment.action === 'retry_later' ? 'Automated Retry in 3 Days' :
                    payment.action === 'retry_now' ? 'Instant Smart Re-attempt' : 'Compliance Identity Review'}
@@ -138,31 +138,31 @@ export default function CustomerPortalModal({ payment, onClose, onSimulateCustom
 
           {/* 3. Bank Notification Confirmation */}
           <div className="space-y-2">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-burgundy-950 flex items-center gap-1.5 font-serif-luxury text-sm">
-              <Building2 className="w-4 h-4 text-burgundy-700" />
+            <h4 className="text-xs font-bold uppercase tracking-wider text-burgundy-950 dark:text-sand-200 flex items-center gap-1.5 font-serif-luxury text-sm">
+              <Building2 className="w-4 h-4 text-burgundy-700 dark:text-dustypink-400" />
               Issuing Bank Notification Telemetry
             </h4>
 
-            <div className="p-4 rounded-2xl bg-white/90 border border-sand-200 text-xs space-y-2.5 shadow-2xs">
+            <div className="p-4 rounded-2xl bg-white/90 dark:bg-burgundy-900/60 border border-sand-200 dark:border-burgundy-800 text-xs space-y-2.5 shadow-2xs">
               <div className="flex items-center justify-between">
-                <span className="text-sand-700 font-medium">Issuing Bank:</span>
-                <span className="font-bold text-burgundy-950 font-sans">{bankNotification.bank_name}</span>
+                <span className="text-sand-700 dark:text-sand-400 font-medium">Issuing Bank:</span>
+                <span className="font-bold text-burgundy-950 dark:text-creme-50 font-sans">{bankNotification.bank_name}</span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-sand-700 font-medium">Notification Event:</span>
-                <span className="font-semibold text-burgundy-800 bg-sand-100 px-2 py-0.5 rounded border border-sand-200 font-mono text-[11px]">
+                <span className="text-sand-700 dark:text-sand-400 font-medium">Notification Event:</span>
+                <span className="font-semibold text-burgundy-800 dark:text-dustypink-200 bg-sand-100 dark:bg-burgundy-800 px-2 py-0.5 rounded border border-sand-200 dark:border-burgundy-700 font-mono text-[11px]">
                   {bankNotification.event}
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-sand-700 font-medium">Bank Reference ID:</span>
-                <span className="font-mono text-sand-700 font-bold text-[11px]">{bankNotification.reference_id}</span>
+                <span className="text-sand-700 dark:text-sand-400 font-medium">Bank Reference ID:</span>
+                <span className="font-mono text-sand-700 dark:text-sand-400 font-bold text-[11px]">{bankNotification.reference_id}</span>
               </div>
 
-              <div className="pt-2 border-t border-sand-200/70 flex items-center gap-1.5 text-[11px] text-emerald-800 font-semibold">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
+              <div className="pt-2 border-t border-sand-200/70 dark:border-burgundy-800/60 flex items-center gap-1.5 text-[11px] text-emerald-800 dark:text-emerald-400 font-semibold">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400" />
                 <span>Decline reason sent to {bankNotification.bank_name} for reference</span>
               </div>
             </div>
@@ -170,13 +170,13 @@ export default function CustomerPortalModal({ payment, onClose, onSimulateCustom
 
           {/* Interactive Customer Card Update Simulator (for expired card cases) */}
           {payment.failure_reason === 'expired_card' && !cardUpdated && (
-            <div className="p-4 rounded-2xl bg-dustypink-50 border border-dustypink-300 space-y-3">
+            <div className="p-4 rounded-2xl bg-dustypink-50 dark:bg-burgundy-900/70 border border-dustypink-300 dark:border-burgundy-700 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-burgundy-950 flex items-center gap-1.5">
-                  <Lock className="w-3.5 h-3.5 text-burgundy-700" />
+                <span className="text-xs font-bold text-burgundy-950 dark:text-creme-50 flex items-center gap-1.5">
+                  <Lock className="w-3.5 h-3.5 text-burgundy-700 dark:text-dustypink-400" />
                   Update Payment Method
                 </span>
-                <span className="text-[10px] font-mono text-dustypink-800">256-Bit SSL</span>
+                <span className="text-[10px] font-mono text-dustypink-800 dark:text-dustypink-300">256-Bit SSL</span>
               </div>
 
               <form onSubmit={handleCardUpdateSubmit} className="space-y-2.5">
@@ -187,7 +187,7 @@ export default function CustomerPortalModal({ payment, onClose, onSimulateCustom
                     placeholder="New Card Number (**** 4242)"
                     value={newCardNumber}
                     onChange={(e) => setNewCardNumber(e.target.value)}
-                    className="col-span-2 bg-white border border-dustypink-300 rounded-xl px-3 py-2 text-xs font-mono text-burgundy-950 focus:outline-none focus:border-burgundy-700"
+                    className="col-span-2 bg-white dark:bg-burgundy-950 border border-dustypink-300 dark:border-burgundy-700 rounded-xl px-3 py-2 text-xs font-mono text-burgundy-950 dark:text-creme-50 placeholder-sand-400 dark:placeholder-sand-500 focus:outline-none focus:border-burgundy-700 dark:focus:border-dustypink-400"
                   />
                   <input
                     type="text"
@@ -195,7 +195,7 @@ export default function CustomerPortalModal({ payment, onClose, onSimulateCustom
                     placeholder="MM / YY (12/28)"
                     value={expiry}
                     onChange={(e) => setExpiry(e.target.value)}
-                    className="bg-white border border-dustypink-300 rounded-xl px-3 py-2 text-xs font-mono text-burgundy-950 focus:outline-none focus:border-burgundy-700"
+                    className="bg-white dark:bg-burgundy-950 border border-dustypink-300 dark:border-burgundy-700 rounded-xl px-3 py-2 text-xs font-mono text-burgundy-950 dark:text-creme-50 placeholder-sand-400 dark:placeholder-sand-500 focus:outline-none focus:border-burgundy-700 dark:focus:border-dustypink-400"
                   />
                   <input
                     type="text"
@@ -203,7 +203,7 @@ export default function CustomerPortalModal({ payment, onClose, onSimulateCustom
                     placeholder="CVV (123)"
                     value={cvv}
                     onChange={(e) => setCvv(e.target.value)}
-                    className="bg-white border border-dustypink-300 rounded-xl px-3 py-2 text-xs font-mono text-burgundy-950 focus:outline-none focus:border-burgundy-700"
+                    className="bg-white dark:bg-burgundy-950 border border-dustypink-300 dark:border-burgundy-700 rounded-xl px-3 py-2 text-xs font-mono text-burgundy-950 dark:text-creme-50 placeholder-sand-400 dark:placeholder-sand-500 focus:outline-none focus:border-burgundy-700 dark:focus:border-dustypink-400"
                   />
                 </div>
 
@@ -229,8 +229,8 @@ export default function CustomerPortalModal({ payment, onClose, onSimulateCustom
           )}
 
           {cardUpdated && (
-            <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-300 text-xs text-emerald-950 flex items-center gap-2.5 animate-fadeIn">
-              <CheckCircle2 className="w-5 h-5 text-emerald-700 flex-shrink-0" />
+            <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700 text-xs text-emerald-950 dark:text-emerald-200 flex items-center gap-2.5 animate-fadeIn">
+              <CheckCircle2 className="w-5 h-5 text-emerald-700 dark:text-emerald-400 flex-shrink-0" />
               <div>
                 <strong className="block font-bold">Card Successfully Updated</strong>
                 <span>New card registered and verification token sent to {bankNotification.bank_name}.</span>
@@ -241,14 +241,14 @@ export default function CustomerPortalModal({ payment, onClose, onSimulateCustom
         </div>
 
         {/* Modal Footer */}
-        <div className="p-5 sm:p-6 border-t border-sand-200 bg-creme-100/70 flex items-center justify-between">
-          <span className="text-xs text-sand-700 font-mono">
+        <div className="p-5 sm:p-6 border-t border-sand-200 dark:border-burgundy-800 bg-creme-100/70 dark:bg-burgundy-900/90 flex items-center justify-between">
+          <span className="text-xs text-sand-700 dark:text-sand-300 font-mono">
             Transaction Ref: {payment.id}
           </span>
 
           <button
             onClick={onClose}
-            className="px-5 py-2 text-xs font-bold rounded-xl text-creme-50 bg-burgundy-800 hover:bg-burgundy-900 transition-colors shadow-sm"
+            className="px-5 py-2 text-xs font-bold rounded-xl text-creme-50 bg-burgundy-800 hover:bg-burgundy-900 dark:bg-burgundy-700 dark:hover:bg-burgundy-600 transition-colors shadow-sm"
           >
             Close Customer View
           </button>

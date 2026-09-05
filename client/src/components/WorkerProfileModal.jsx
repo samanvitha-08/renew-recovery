@@ -205,11 +205,11 @@ export default function WorkerProfileModal({
   }, [user, timeframe, payments]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-burgundy-950/60 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-creme-50 border border-sand-300 rounded-3xl shadow-soft-xl max-w-3xl w-full max-h-[92vh] flex flex-col overflow-hidden animate-scaleUp">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-burgundy-950/60 dark:bg-black/70 backdrop-blur-sm animate-fadeIn">
+      <div className="bg-creme-50 dark:bg-burgundy-950 border border-sand-300 dark:border-burgundy-800 rounded-3xl shadow-soft-xl max-w-3xl w-full max-h-[92vh] flex flex-col overflow-hidden animate-scaleUp">
         
         {/* Modal Header */}
-        <div className="p-6 bg-gradient-to-r from-sand-100 via-creme-50 to-dustypink-50/80 border-b border-sand-200/90 flex items-start justify-between">
+        <div className="p-6 bg-gradient-to-r from-sand-100 via-creme-50 to-dustypink-50/80 dark:from-burgundy-900 dark:via-burgundy-950 dark:to-burgundy-900 border-b border-sand-200/90 dark:border-burgundy-800/80 flex items-start justify-between">
           <div className="flex items-center space-x-4">
             {/* Worker Avatar */}
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-burgundy-800 to-burgundy-600 text-creme-50 flex items-center justify-center font-bold text-xl shadow-md shadow-burgundy-900/20 ring-2 ring-dustypink-300/40">
@@ -217,21 +217,21 @@ export default function WorkerProfileModal({
             </div>
             <div>
               <div className="flex items-center gap-2.5 flex-wrap">
-                <h3 className="text-xl font-bold font-serif-luxury text-burgundy-950">
+                <h3 className="text-xl font-bold font-serif-luxury text-burgundy-950 dark:text-creme-50">
                   {user?.name || 'Worker Profile'}
                 </h3>
                 <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full font-mono border ${
-                  user?.role === 'Admin' ? 'bg-burgundy-100 text-burgundy-900 border-burgundy-300' :
-                  user?.role === 'Ops' ? 'bg-dustypink-100 text-dustypink-900 border-dustypink-300' :
-                  'bg-sand-200 text-sand-800 border-sand-300'
+                  user?.role === 'Admin' ? 'bg-burgundy-100 dark:bg-burgundy-800 text-burgundy-900 dark:text-dustypink-200 border-burgundy-300 dark:border-burgundy-700' :
+                  user?.role === 'Ops' ? 'bg-dustypink-100 dark:bg-burgundy-800/80 text-dustypink-900 dark:text-dustypink-200 border-dustypink-300 dark:border-burgundy-700' :
+                  'bg-sand-200 dark:bg-burgundy-900 text-sand-800 dark:text-sand-300 border-sand-300 dark:border-burgundy-700'
                 }`}>
                   {user?.role || 'Operator'} Role
                 </span>
-                <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-sand-200/80 text-sand-800 border border-sand-300 font-medium">
+                <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-sand-200/80 dark:bg-burgundy-900 text-sand-800 dark:text-sand-300 border border-sand-300 dark:border-burgundy-700 font-medium">
                   💳 Involuntary Churn Ops Desk
                 </span>
               </div>
-              <p className="text-xs text-sand-700 font-mono mt-1">
+              <p className="text-xs text-sand-700 dark:text-sand-400 font-mono mt-1">
                 {user?.email || user?.username || 'operator@recover.demo'} • ID: REC-OP-{user?.role?.toUpperCase() || '01'}
               </p>
             </div>
@@ -240,31 +240,31 @@ export default function WorkerProfileModal({
           {/* Close Button */}
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-sand-500 hover:text-burgundy-950 hover:bg-sand-200/80 transition-colors"
+            className="p-2 rounded-xl text-sand-500 hover:text-burgundy-950 dark:hover:text-creme-50 hover:bg-sand-200/80 dark:hover:bg-burgundy-800/80 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Modal Body */}
-        <div className="p-6 overflow-y-auto space-y-6 bg-creme-100/40">
+        <div className="p-6 overflow-y-auto space-y-6 bg-creme-100/40 dark:bg-burgundy-950/60">
           
           {/* Controls Bar: Timeframe Toggle & Status */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white/80 p-3.5 rounded-2xl border border-sand-200/90 shadow-2xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white/80 dark:bg-burgundy-900/80 p-3.5 rounded-2xl border border-sand-200/90 dark:border-burgundy-800 shadow-2xs">
             <div className="flex items-center gap-2">
               <div className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse"></div>
-              <span className="text-xs font-bold text-burgundy-950">Operator Shift Performance</span>
-              <span className="text-[11px] text-sand-600 font-medium">• Live Telemetry</span>
+              <span className="text-xs font-bold text-burgundy-950 dark:text-creme-50">Operator Shift Performance</span>
+              <span className="text-[11px] text-sand-600 dark:text-sand-400 font-medium">• Live Telemetry</span>
             </div>
 
             {/* "This Week" vs "All Time" Toggle */}
-            <div className="inline-flex bg-sand-200/70 p-1 rounded-xl border border-sand-300/80">
+            <div className="inline-flex bg-sand-200/70 dark:bg-burgundy-950/80 p-1 rounded-xl border border-sand-300/80 dark:border-burgundy-800">
               <button
                 onClick={() => setTimeframe('week')}
                 className={`px-3 py-1 text-xs font-bold rounded-lg transition-all ${
                   timeframe === 'week'
-                    ? 'bg-burgundy-800 text-creme-50 shadow-2xs'
-                    : 'text-sand-700 hover:text-burgundy-900'
+                    ? 'bg-burgundy-800 dark:bg-burgundy-700 text-creme-50 shadow-2xs'
+                    : 'text-sand-700 dark:text-sand-300 hover:text-burgundy-900 dark:hover:text-creme-50'
                 }`}
               >
                 This Week
@@ -273,8 +273,8 @@ export default function WorkerProfileModal({
                 onClick={() => setTimeframe('all')}
                 className={`px-3 py-1 text-xs font-bold rounded-lg transition-all ${
                   timeframe === 'all'
-                    ? 'bg-burgundy-800 text-creme-50 shadow-2xs'
-                    : 'text-sand-700 hover:text-burgundy-900'
+                    ? 'bg-burgundy-800 dark:bg-burgundy-700 text-creme-50 shadow-2xs'
+                    : 'text-sand-700 dark:text-sand-300 hover:text-burgundy-900 dark:hover:text-creme-50'
                 }`}
               >
                 All Time
@@ -286,52 +286,52 @@ export default function WorkerProfileModal({
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             
             {/* Total Revenue Recovered */}
-            <div className="p-4 rounded-2xl bg-gradient-to-br from-white via-creme-50 to-dustypink-50/50 border border-sand-300/80 shadow-2xs space-y-1">
-              <div className="flex items-center justify-between text-sand-700">
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-white via-creme-50 to-dustypink-50/50 dark:from-burgundy-900/80 dark:via-burgundy-950 dark:to-burgundy-900/70 border border-sand-300/80 dark:border-burgundy-800 shadow-2xs space-y-1">
+              <div className="flex items-center justify-between text-sand-700 dark:text-sand-300">
                 <span className="text-[11px] font-bold uppercase tracking-wider">Revenue Recovered</span>
-                <div className="p-1.5 rounded-lg bg-burgundy-100 text-burgundy-700">
+                <div className="p-1.5 rounded-lg bg-burgundy-100 dark:bg-burgundy-800 text-burgundy-700 dark:text-dustypink-300">
                   <DollarSign className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-2xl font-bold font-serif-luxury text-burgundy-950">
+              <div className="text-2xl font-bold font-serif-luxury text-burgundy-950 dark:text-creme-50">
                 ${performance.totalRecoveredDollars.toLocaleString('en-US', { minimumFractionDigits: 2 })}
               </div>
-              <p className="text-[11px] text-sand-600 font-medium flex items-center gap-1 pt-0.5">
-                <ArrowUpRight className="w-3 h-3 text-emerald-600" />
+              <p className="text-[11px] text-sand-600 dark:text-sand-400 font-medium flex items-center gap-1 pt-0.5">
+                <ArrowUpRight className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                 Personal contribution to revenue
               </p>
             </div>
 
             {/* Total Transactions Handled */}
-            <div className="p-4 rounded-2xl bg-gradient-to-br from-white via-creme-50 to-sand-50 border border-sand-300/80 shadow-2xs space-y-1">
-              <div className="flex items-center justify-between text-sand-700">
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-white via-creme-50 to-sand-50 dark:from-burgundy-900/80 dark:via-burgundy-950 dark:to-burgundy-900/70 border border-sand-300/80 dark:border-burgundy-800 shadow-2xs space-y-1">
+              <div className="flex items-center justify-between text-sand-700 dark:text-sand-300">
                 <span className="text-[11px] font-bold uppercase tracking-wider">Transactions Handled</span>
-                <div className="p-1.5 rounded-lg bg-sand-200 text-sand-800">
+                <div className="p-1.5 rounded-lg bg-sand-200 dark:bg-burgundy-800 text-sand-800 dark:text-sand-200">
                   <Layers className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-2xl font-bold font-serif-luxury text-burgundy-950">
-                {performance.totalHandled} <span className="text-xs font-normal text-sand-600 font-sans">payments</span>
+              <div className="text-2xl font-bold font-serif-luxury text-burgundy-950 dark:text-creme-50">
+                {performance.totalHandled} <span className="text-xs font-normal text-sand-600 dark:text-sand-400 font-sans">payments</span>
               </div>
-              <p className="text-[11px] text-sand-600 font-medium pt-0.5">
+              <p className="text-[11px] text-sand-600 dark:text-sand-400 font-medium pt-0.5">
                 Executed via 1-click & AI workflows
               </p>
             </div>
 
             {/* Success Rate */}
-            <div className="p-4 rounded-2xl bg-gradient-to-br from-white via-creme-50 to-dustypink-50/50 border border-sand-300/80 shadow-2xs space-y-1">
-              <div className="flex items-center justify-between text-sand-700">
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-white via-creme-50 to-dustypink-50/50 dark:from-burgundy-900/80 dark:via-burgundy-950 dark:to-burgundy-900/70 border border-sand-300/80 dark:border-burgundy-800 shadow-2xs space-y-1">
+              <div className="flex items-center justify-between text-sand-700 dark:text-sand-300">
                 <span className="text-[11px] font-bold uppercase tracking-wider">Recovery Success Rate</span>
-                <div className="p-1.5 rounded-lg bg-dustypink-200 text-burgundy-800">
+                <div className="p-1.5 rounded-lg bg-dustypink-200 dark:bg-burgundy-800 text-burgundy-800 dark:text-dustypink-300">
                   <Target className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-2xl font-bold font-serif-luxury text-burgundy-950">
+              <div className="text-2xl font-bold font-serif-luxury text-burgundy-950 dark:text-creme-50">
                 {performance.successRate}%
               </div>
-              <div className="w-full bg-sand-200 h-1.5 rounded-full overflow-hidden mt-1">
+              <div className="w-full bg-sand-200 dark:bg-burgundy-900 h-1.5 rounded-full overflow-hidden mt-1">
                 <div 
-                  className="bg-gradient-to-r from-dustypink-400 to-burgundy-700 h-full rounded-full transition-all duration-500"
+                  className="bg-gradient-to-r from-dustypink-400 to-burgundy-700 dark:from-dustypink-500 dark:to-dustypink-300 h-full rounded-full transition-all duration-500"
                   style={{ width: `${performance.successRate}%` }}
                 />
               </div>
@@ -341,58 +341,58 @@ export default function WorkerProfileModal({
 
           {/* Breakdown By Action Type */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-sand-800 flex items-center gap-1.5">
-              <BarChart3 className="w-4 h-4 text-burgundy-700" />
+            <h4 className="text-xs font-bold uppercase tracking-wider text-sand-800 dark:text-sand-300 flex items-center gap-1.5">
+              <BarChart3 className="w-4 h-4 text-burgundy-700 dark:text-dustypink-300" />
               Breakdown by Action Type Handled
             </h4>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {/* Emails */}
-              <div className="p-3.5 rounded-xl bg-white/90 border border-sand-300/80 text-left space-y-1">
-                <div className="flex items-center gap-1.5 text-dustypink-800 text-xs font-bold">
-                  <Mail className="w-3.5 h-3.5 text-dustypink-600" />
+              <div className="p-3.5 rounded-xl bg-white/90 dark:bg-burgundy-900/90 border border-sand-300/80 dark:border-burgundy-800 text-left space-y-1">
+                <div className="flex items-center gap-1.5 text-dustypink-800 dark:text-dustypink-300 text-xs font-bold">
+                  <Mail className="w-3.5 h-3.5 text-dustypink-600 dark:text-dustypink-400" />
                   Card Update Emails
                 </div>
-                <div className="text-lg font-bold font-serif-luxury text-burgundy-950">
-                  {performance.emailSends} <span className="text-[10px] font-normal text-sand-600 font-sans">sends</span>
+                <div className="text-lg font-bold font-serif-luxury text-burgundy-950 dark:text-creme-50">
+                  {performance.emailSends} <span className="text-[10px] font-normal text-sand-600 dark:text-sand-400 font-sans">sends</span>
                 </div>
-                <div className="text-[10px] text-sand-600">Expired card workflows</div>
+                <div className="text-[10px] text-sand-600 dark:text-sand-400">Expired card workflows</div>
               </div>
 
               {/* Instant Retries */}
-              <div className="p-3.5 rounded-xl bg-white/90 border border-sand-300/80 text-left space-y-1">
-                <div className="flex items-center gap-1.5 text-burgundy-800 text-xs font-bold">
-                  <Zap className="w-3.5 h-3.5 text-burgundy-600" />
+              <div className="p-3.5 rounded-xl bg-white/90 dark:bg-burgundy-900/90 border border-sand-300/80 dark:border-burgundy-800 text-left space-y-1">
+                <div className="flex items-center gap-1.5 text-burgundy-800 dark:text-dustypink-300 text-xs font-bold">
+                  <Zap className="w-3.5 h-3.5 text-burgundy-600 dark:text-dustypink-400" />
                   Instant Retries
                 </div>
-                <div className="text-lg font-bold font-serif-luxury text-burgundy-950">
-                  {performance.retryNows} <span className="text-[10px] font-normal text-sand-600 font-sans">retries</span>
+                <div className="text-lg font-bold font-serif-luxury text-burgundy-950 dark:text-creme-50">
+                  {performance.retryNows} <span className="text-[10px] font-normal text-sand-600 dark:text-sand-400 font-sans">retries</span>
                 </div>
-                <div className="text-[10px] text-sand-600">Smart gateway routing</div>
+                <div className="text-[10px] text-sand-600 dark:text-sand-400">Smart gateway routing</div>
               </div>
 
               {/* Scheduled 3d Retries */}
-              <div className="p-3.5 rounded-xl bg-white/90 border border-sand-300/80 text-left space-y-1">
-                <div className="flex items-center gap-1.5 text-sand-800 text-xs font-bold">
-                  <Clock className="w-3.5 h-3.5 text-sand-700" />
+              <div className="p-3.5 rounded-xl bg-white/90 dark:bg-burgundy-900/90 border border-sand-300/80 dark:border-burgundy-800 text-left space-y-1">
+                <div className="flex items-center gap-1.5 text-sand-800 dark:text-sand-200 text-xs font-bold">
+                  <Clock className="w-3.5 h-3.5 text-sand-700 dark:text-sand-300" />
                   Scheduled Retries
                 </div>
-                <div className="text-lg font-bold font-serif-luxury text-burgundy-950">
-                  {performance.retryLaters} <span className="text-[10px] font-normal text-sand-600 font-sans">queued</span>
+                <div className="text-lg font-bold font-serif-luxury text-burgundy-950 dark:text-creme-50">
+                  {performance.retryLaters} <span className="text-[10px] font-normal text-sand-600 dark:text-sand-400 font-sans">queued</span>
                 </div>
-                <div className="text-[10px] text-sand-600">3-day pay cycle timing</div>
+                <div className="text-[10px] text-sand-600 dark:text-sand-400">3-day pay cycle timing</div>
               </div>
 
               {/* Fraud Escalations */}
-              <div className="p-3.5 rounded-xl bg-white/90 border border-sand-300/80 text-left space-y-1">
-                <div className="flex items-center gap-1.5 text-burgundy-900 text-xs font-bold">
-                  <ShieldAlert className="w-3.5 h-3.5 text-burgundy-800" />
+              <div className="p-3.5 rounded-xl bg-white/90 dark:bg-burgundy-900/90 border border-sand-300/80 dark:border-burgundy-800 text-left space-y-1">
+                <div className="flex items-center gap-1.5 text-burgundy-900 dark:text-dustypink-300 text-xs font-bold">
+                  <ShieldAlert className="w-3.5 h-3.5 text-burgundy-800 dark:text-dustypink-400" />
                   Risk Escalations
                 </div>
-                <div className="text-lg font-bold font-serif-luxury text-burgundy-950">
-                  {performance.escalations} <span className="text-[10px] font-normal text-sand-600 font-sans">cases</span>
+                <div className="text-lg font-bold font-serif-luxury text-burgundy-950 dark:text-creme-50">
+                  {performance.escalations} <span className="text-[10px] font-normal text-sand-600 dark:text-sand-400 font-sans">cases</span>
                 </div>
-                <div className="text-[10px] text-sand-600">Halted high risk flags</div>
+                <div className="text-[10px] text-sand-600 dark:text-sand-400">Halted high risk flags</div>
               </div>
             </div>
           </div>
@@ -400,46 +400,46 @@ export default function WorkerProfileModal({
           {/* Worker Activity Log Stream */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-sand-800 flex items-center gap-1.5">
-                <Activity className="w-4 h-4 text-burgundy-700" />
+              <h4 className="text-xs font-bold uppercase tracking-wider text-sand-800 dark:text-sand-300 flex items-center gap-1.5">
+                <Activity className="w-4 h-4 text-burgundy-700 dark:text-dustypink-300" />
                 Operator Activity Ledger ({performance.allActivities.length} actions)
               </h4>
-              <span className="text-[11px] text-sand-600 font-mono">
+              <span className="text-[11px] text-sand-600 dark:text-sand-400 font-mono">
                 Attributed to: {user?.name || 'Samanvitha'}
               </span>
             </div>
 
-            <div className="border border-sand-200/90 rounded-2xl overflow-hidden bg-white/80 shadow-2xs divide-y divide-sand-200/70 max-h-64 overflow-y-auto">
+            <div className="border border-sand-200/90 dark:border-burgundy-800 rounded-2xl overflow-hidden bg-white/80 dark:bg-burgundy-900/60 shadow-2xs divide-y divide-sand-200/70 dark:divide-burgundy-800/70 max-h-64 overflow-y-auto">
               {performance.allActivities.length === 0 ? (
-                <div className="p-8 text-center text-xs text-sand-600 font-medium">
+                <div className="p-8 text-center text-xs text-sand-600 dark:text-sand-400 font-medium">
                   No recovery actions executed yet in this session. Click &quot;Execute&quot; on a payment in the queue to record your operator impact!
                 </div>
               ) : (
                 performance.allActivities.map((item) => (
-                  <div key={item.id} className="p-3.5 hover:bg-sand-50/80 transition-colors flex items-center justify-between gap-3 text-xs">
+                  <div key={item.id} className="p-3.5 hover:bg-sand-50/80 dark:hover:bg-burgundy-900/80 transition-colors flex items-center justify-between gap-3 text-xs">
                     <div className="space-y-0.5">
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-burgundy-950">{item.customerName}</span>
-                        <span className="text-[11px] text-sand-600 font-mono">{item.customerEmail}</span>
-                        <span className="text-[10px] text-sand-500 font-mono">••••{item.cardLast4}</span>
+                        <span className="font-bold text-burgundy-950 dark:text-creme-50">{item.customerName}</span>
+                        <span className="text-[11px] text-sand-600 dark:text-sand-400 font-mono">{item.customerEmail}</span>
+                        <span className="text-[10px] text-sand-500 dark:text-sand-400 font-mono">••••{item.cardLast4}</span>
                       </div>
-                      <div className="text-[11px] text-sand-700 flex items-center gap-1.5">
-                        <span className="font-medium text-burgundy-900">{item.actionLabel}</span>
+                      <div className="text-[11px] text-sand-700 dark:text-sand-300 flex items-center gap-1.5">
+                        <span className="font-medium text-burgundy-900 dark:text-dustypink-300">{item.actionLabel}</span>
                         <span className="text-sand-400">•</span>
-                        <span className="text-sand-500 font-mono">
+                        <span className="text-sand-500 dark:text-sand-400 font-mono">
                           {new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
                     </div>
 
                     <div className="text-right">
-                      <span className="font-mono font-bold text-burgundy-950 text-xs block">
+                      <span className="font-mono font-bold text-burgundy-950 dark:text-creme-50 text-xs block">
                         ${item.amount?.toFixed(2)}
                       </span>
                       <span className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded-full mt-0.5 ${
-                        item.status === 'recovered' ? 'bg-burgundy-100 text-burgundy-900 border border-burgundy-200' :
-                        item.status === 'pending' ? 'bg-sand-200 text-sand-800 border border-sand-300' :
-                        'bg-dustypink-100 text-dustypink-900 border border-dustypink-300'
+                        item.status === 'recovered' ? 'bg-burgundy-100 dark:bg-burgundy-800 text-burgundy-900 dark:text-dustypink-200 border border-burgundy-200 dark:border-burgundy-700' :
+                        item.status === 'pending' ? 'bg-sand-200 dark:bg-burgundy-900 text-sand-800 dark:text-sand-200 border border-sand-300 dark:border-burgundy-700' :
+                        'bg-dustypink-100 dark:bg-burgundy-800/80 text-dustypink-900 dark:text-dustypink-200 border border-dustypink-300 dark:border-burgundy-700'
                       }`}>
                         {item.outcome}
                       </span>
@@ -453,14 +453,14 @@ export default function WorkerProfileModal({
         </div>
 
         {/* Modal Footer */}
-        <div className="p-4 bg-sand-100/60 border-t border-sand-200/80 flex items-center justify-between text-xs text-sand-700">
-          <div className="flex items-center gap-1.5 text-sand-600">
-            <Award className="w-4 h-4 text-burgundy-700" />
+        <div className="p-4 bg-sand-100/60 dark:bg-burgundy-900/70 border-t border-sand-200/80 dark:border-burgundy-800/80 flex items-center justify-between text-xs text-sand-700 dark:text-sand-300">
+          <div className="flex items-center gap-1.5 text-sand-600 dark:text-sand-400">
+            <Award className="w-4 h-4 text-burgundy-700 dark:text-dustypink-300" />
             <span>Autonomous Involuntary Churn Recovery Metrics</span>
           </div>
           <button
             onClick={onClose}
-            className="px-4 py-2 font-bold text-xs bg-burgundy-800 text-creme-50 rounded-xl hover:bg-burgundy-900 transition-all shadow-2xs active:scale-95"
+            className="px-4 py-2 font-bold text-xs bg-burgundy-800 dark:bg-burgundy-700 text-creme-50 rounded-xl hover:bg-burgundy-900 dark:hover:bg-burgundy-600 transition-all shadow-2xs active:scale-95"
           >
             Close Dashboard
           </button>
