@@ -5,30 +5,27 @@ import {
   Sun,
   Moon,
   Clock,
-  Activity,
-  Zap,
-  Shield,
+  LogIn,
+  LogOut,
   Sparkles
 } from 'lucide-react';
 
 export default function Header({ 
+  user,
+  loginTime,
+  onLogout,
   onToggleMobileSidebar,
   theme = 'light',
   onToggleTheme
 }) {
-  // Live Shift Hours Timer (Simulates a standard shift started 4 hours 15 min ago, ticking in real time)
+  // Live Shift Hours Timer
   const [elapsedSeconds, setElapsedSeconds] = useState(() => {
-    // 4 hours, 18 minutes baseline shift
     return 4 * 3600 + 18 * 60;
   });
-
-  // Current UTC Settlement Clock
-  const [utcTime, setUtcTime] = useState(() => new Date().toUTCString().slice(17, 25));
 
   useEffect(() => {
     const timer = setInterval(() => {
       setElapsedSeconds(prev => prev + 1);
-      setUtcTime(new Date().toUTCString().slice(17, 25));
     }, 1000);
 
     return () => clearInterval(timer);
@@ -78,36 +75,44 @@ export default function Header({
             </div>
           </div>
 
-          {/* Right Side: Useful Ops Tools (Hours Worked, Gateway Status, Theme Toggle) */}
-          <div className="flex items-center space-x-2.5">
+          {/* Right Side: Useful Ops Tools (Login Time, Hours Worked, Theme Toggle, Log Out) */}
+          <div className="flex items-center space-x-2 sm:space-x-2.5">
             
+            {/* Login Time Display */}
+            <div 
+              className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-sand-100/90 dark:bg-burgundy-900/60 border border-sand-300/80 dark:border-burgundy-800 shadow-2xs text-xs"
+              title={`Logged in at ${loginTime || 'Active Session'}`}
+            >
+              <div className="p-1 rounded-lg bg-white/90 dark:bg-burgundy-800 text-burgundy-700 dark:text-dustypink-300">
+                <LogIn className="w-3.5 h-3.5" />
+              </div>
+              <div className="text-left">
+                <span className="hidden sm:inline-block text-[9px] uppercase tracking-wider text-sand-600 dark:text-sand-400 font-bold block leading-none">
+                  Login Time
+                </span>
+                <span className="font-mono font-bold text-burgundy-950 dark:text-creme-50 text-[11px] leading-tight">
+                  {loginTime || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </span>
+              </div>
+            </div>
+
             {/* Hours Worked / Shift Duration Timer */}
             <div 
-              className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/90 dark:bg-burgundy-900/70 border border-sand-300/80 dark:border-burgundy-800 shadow-2xs text-xs"
-              title="Current Active Shift Duration (Clocked in at 08:00 AM)"
+              className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/90 dark:bg-burgundy-900/70 border border-sand-300/80 dark:border-burgundy-800 shadow-2xs text-xs"
+              title="Active Shift Duration"
             >
               <div className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-emerald-600 animate-ping" />
                 <Clock className="w-3.5 h-3.5 text-burgundy-700 dark:text-dustypink-300" />
               </div>
               <div className="text-left">
-                <span className="hidden sm:inline-block text-[9px] uppercase tracking-wider text-sand-600 dark:text-sand-400 font-bold block leading-none">
+                <span className="text-[9px] uppercase tracking-wider text-sand-600 dark:text-sand-400 font-bold block leading-none">
                   Hours Worked
                 </span>
                 <span className="font-mono font-bold text-burgundy-950 dark:text-creme-50 text-[11px] leading-tight">
                   {formattedHours}
                 </span>
               </div>
-            </div>
-
-            {/* Gateway Telemetry & UTC Settlement Clock (Hidden on very small screens) */}
-            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-sand-100/80 dark:bg-burgundy-900/50 border border-sand-300/70 dark:border-burgundy-800/80 text-[11px] font-mono text-sand-700 dark:text-sand-300">
-              <span className="flex items-center gap-1">
-                <Zap className="w-3 h-3 text-amber-600 dark:text-amber-400" />
-                <span>12ms</span>
-              </span>
-              <span className="text-sand-400">•</span>
-              <span>{utcTime} UTC</span>
             </div>
 
             {/* Light / Dark Theme Switcher Button */}
@@ -128,6 +133,18 @@ export default function Header({
                 </>
               )}
             </button>
+
+            {/* Log Out Button */}
+            {onLogout && (
+              <button
+                onClick={onLogout}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-burgundy-100/90 dark:bg-burgundy-900/90 hover:bg-burgundy-200 dark:hover:bg-burgundy-800 border border-burgundy-300/80 dark:border-burgundy-700 text-burgundy-950 dark:text-dustypink-200 shadow-2xs hover:shadow transition-all active:scale-95 text-xs font-bold"
+                title="Log out of session"
+              >
+                <LogOut className="w-3.5 h-3.5 text-burgundy-700 dark:text-dustypink-300" />
+                <span className="hidden sm:inline">Log Out</span>
+              </button>
+            )}
 
           </div>
 

@@ -28,6 +28,9 @@ export default function App() {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [authChecked, setAuthChecked] = useState(false);
+  const [loginTime, setLoginTime] = useState(() => {
+    return localStorage.getItem('recover_login_time') || '';
+  });
 
   // Application Data State
   const [payments, setPayments] = useState([]);
@@ -79,24 +82,36 @@ export default function App() {
   useEffect(() => {
     const savedToken = localStorage.getItem('recover_auth_token');
     const savedUser = localStorage.getItem('recover_auth_user');
+    const savedLoginTime = localStorage.getItem('recover_login_time');
 
     if (savedToken && savedUser) {
       try {
         setToken(savedToken);
         setUser(JSON.parse(savedUser));
+        if (savedLoginTime) {
+          setLoginTime(savedLoginTime);
+        } else {
+          const currentNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          setLoginTime(currentNow);
+          localStorage.setItem('recover_login_time', currentNow);
+        }
       } catch (err) {
         localStorage.removeItem('recover_auth_token');
         localStorage.removeItem('recover_auth_user');
+        localStorage.removeItem('recover_login_time');
       }
     }
     setAuthChecked(true);
   }, []);
 
   const handleLoginSuccess = (userData, sessionToken) => {
+    const currentNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     setUser(userData);
     setToken(sessionToken);
+    setLoginTime(currentNow);
     localStorage.setItem('recover_auth_token', sessionToken);
     localStorage.setItem('recover_auth_user', JSON.stringify(userData));
+    localStorage.setItem('recover_login_time', currentNow);
     showToast(`Welcome back, ${userData.name}! Logged in as ${userData.role}.`);
   };
 
@@ -113,8 +128,10 @@ export default function App() {
     } finally {
       setUser(null);
       setToken(null);
+      setLoginTime('');
       localStorage.removeItem('recover_auth_token');
       localStorage.removeItem('recover_auth_user');
+      localStorage.removeItem('recover_login_time');
       showToast('Logged out successfully.');
     }
   };
@@ -342,6 +359,9 @@ export default function App() {
         
         {/* Navigation Header */}
         <Header
+          user={user}
+          loginTime={loginTime}
+          onLogout={handleLogout}
           theme={theme}
           onToggleTheme={toggleTheme}
           onToggleMobileSidebar={() => setMobileSidebarOpen(prev => !prev)}
