@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: light;
+  color-scheme: light dark;
 }
 
 body {
@@ -17,6 +17,16 @@ body {
   background-attachment: fixed;
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   color: #32040F;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+html.dark body {
+  background-color: #190207;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(95, 14, 35, 0.35) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(49, 4, 15, 0.6) 0px, transparent 50%),
+    radial-gradient(at 50% 50%, rgba(25, 2, 7, 0.95) 0px, transparent 100%);
+  color: #FDFBF7;
 }
 
 /* Custom Luxury Scrollbars */

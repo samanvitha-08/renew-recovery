@@ -46,6 +46,24 @@ export default function App() {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
 
+  // Theme State ('light' | 'dark')
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem('recover_theme') || 'light';
+  });
+
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('recover_theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
+
   // ~30-Second Processing Map: { [paymentId]: { progress: number, secondsRemaining: number } }
   const [processingMap, setProcessingMap] = useState({});
   const intervalsRef = useRef({});
@@ -324,14 +342,8 @@ export default function App() {
         
         {/* Navigation Header */}
         <Header
-          stats={stats}
-          onRecoverAll={handleRecoverAll}
-          onReset={handleReset}
-          isRecovering={isRecovering}
-          onOpenAuditLog={() => setIsAuditLogOpen(true)}
-          onOpenProfile={() => setIsProfileOpen(true)}
-          user={user}
-          onLogout={handleLogout}
+          theme={theme}
+          onToggleTheme={toggleTheme}
           onToggleMobileSidebar={() => setMobileSidebarOpen(prev => !prev)}
         />
 
