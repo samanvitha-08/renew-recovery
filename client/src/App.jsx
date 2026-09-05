@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Header from './components/Header';
+import Sidebar from './components/Sidebar';
 import MetricCard from './components/MetricCard';
 import FailureChart from './components/FailureChart';
-import AgentRulesBanner from './components/AgentRulesBanner';
 import PaymentTable from './components/PaymentTable';
 import PaymentDetailModal from './components/PaymentDetailModal';
 import AuditLogModal from './components/AuditLogModal';
@@ -14,7 +14,7 @@ import {
   DollarSign, 
   CheckCircle2, 
   ShieldAlert, 
-  TrendingUp,
+  TrendingUp, 
   Sparkles,
   Bot,
   Check,
@@ -38,11 +38,12 @@ export default function App() {
   const [selectedReason, setSelectedReason] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   
-  // Modals State
+  // Modals & Sidebar State
   const [activeModalPayment, setActiveModalPayment] = useState(null);
   const [customerViewPayment, setCustomerViewPayment] = useState(null);
   const [isAuditLogOpen, setIsAuditLogOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
 
   // ~30-Second Processing Map: { [paymentId]: { progress: number, secondsRemaining: number } }
@@ -290,7 +291,7 @@ export default function App() {
   const recoveryRate = stats?.recoveryRate || 0;
 
   return (
-    <div className="min-h-screen bg-creme-100 text-burgundy-950 flex flex-col selection:bg-dustypink-200 selection:text-burgundy-950">
+    <div className="min-h-screen bg-creme-100 text-burgundy-950 flex selection:bg-dustypink-200 selection:text-burgundy-950">
       
       {/* Toast Notification */}
       {toastMessage && (
@@ -304,113 +305,142 @@ export default function App() {
         </div>
       )}
 
-      {/* Navigation Header with User Profile & Logout */}
-      <Header
+      {/* Navigation Sidebar */}
+      <Sidebar
+        user={user}
         stats={stats}
+        isRecovering={isRecovering}
         onRecoverAll={handleRecoverAll}
         onReset={handleReset}
-        isRecovering={isRecovering}
         onOpenAuditLog={() => setIsAuditLogOpen(true)}
         onOpenProfile={() => setIsProfileOpen(true)}
-        user={user}
         onLogout={handleLogout}
+        isOpen={mobileSidebarOpen}
+        onClose={() => setMobileSidebarOpen(false)}
       />
 
-      {/* Main Dashboard Content */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      {/* Main Content Workspace */}
+      <div className="flex-1 flex flex-col min-w-0">
         
-        {/* Hero Section Banner */}
-        <div className="relative overflow-hidden rounded-3xl border border-sand-300/80 bg-gradient-to-br from-creme-50 via-sand-50/90 to-dustypink-50/70 p-7 sm:p-9 shadow-soft-lg">
-          <div className="absolute -right-20 -top-20 w-72 h-72 bg-dustypink-200/40 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -left-20 -bottom-20 w-72 h-72 bg-sand-200/50 rounded-full blur-3xl pointer-events-none" />
+        {/* Navigation Header */}
+        <Header
+          stats={stats}
+          onRecoverAll={handleRecoverAll}
+          onReset={handleReset}
+          isRecovering={isRecovering}
+          onOpenAuditLog={() => setIsAuditLogOpen(true)}
+          onOpenProfile={() => setIsProfileOpen(true)}
+          user={user}
+          onLogout={handleLogout}
+          onToggleMobileSidebar={() => setMobileSidebarOpen(prev => !prev)}
+        />
 
-          <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-            <div className="max-w-3xl space-y-2.5">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-dustypink-100 text-burgundy-800 border border-dustypink-300 text-xs font-bold font-sans">
-                <Sparkles className="w-3.5 h-3.5 text-burgundy-600" />
-                Autonomous Revenue Recovery
+        {/* Main Dashboard Content */}
+        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+          
+          {/* Hero Section Banner */}
+          <div className="relative overflow-hidden rounded-3xl border border-sand-300/80 bg-gradient-to-br from-creme-50 via-sand-50/90 to-dustypink-50/70 p-7 sm:p-9 shadow-soft-lg">
+            <div className="absolute -right-20 -top-20 w-72 h-72 bg-dustypink-200/40 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -left-20 -bottom-20 w-72 h-72 bg-sand-200/50 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+              <div className="max-w-3xl space-y-2.5">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-dustypink-100 text-burgundy-800 border border-dustypink-300 text-xs font-bold font-sans">
+                  <Sparkles className="w-3.5 h-3.5 text-burgundy-600" />
+                  Autonomous Revenue Recovery
+                </div>
+                <h2 className="text-2xl sm:text-4xl font-bold font-serif-luxury tracking-tight text-burgundy-950 leading-tight">
+                  Turn Involuntary Churn into Recovered Revenue
+                </h2>
+                <p className="text-sm text-sand-800 leading-relaxed font-medium">
+                  Recover monitors failed subscription transactions, predicts customer payment behavior, and executes intelligent automated recovery workflows with precision.
+                </p>
               </div>
-              <h2 className="text-2xl sm:text-4xl font-bold font-serif-luxury tracking-tight text-burgundy-950 leading-tight">
-                Turn Involuntary Churn into Recovered Revenue
-              </h2>
-              <p className="text-sm text-sand-800 leading-relaxed font-medium">
-                Recover monitors failed subscription transactions, predicts customer payment behavior, and executes intelligent automated recovery workflows with precision.
-              </p>
             </div>
           </div>
-        </div>
 
-        {/* Top Financial Metrics Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <MetricCard
-            title="Total Revenue at Risk"
-            value={`$${totalAtRisk.toLocaleString('en-US', { minimumFractionDigits: 2 })}`}
-            subtitle="Sum of all 30 monitored failed payments"
-            icon={AlertTriangle}
-            variant="danger"
-            badge="30 Failures"
-          />
+          {/* Top Financial Metrics Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <MetricCard
+              title="Total Revenue at Risk"
+              value={`$${totalAtRisk.toLocaleString('en-US', { minimumFractionDigits: 2 })}`}
+              subtitle="Sum of all 30 monitored failed payments"
+              icon={AlertTriangle}
+              variant="danger"
+              badge="30 Failures"
+            />
 
-          <MetricCard
-            title="Total Revenue Recovered"
-            value={`$${totalRecovered.toLocaleString('en-US', { minimumFractionDigits: 2 })}`}
-            subtitle={`${stats?.recoveredCount || 0} payments successfully captured`}
-            icon={DollarSign}
-            variant="success"
-            badge={`+${recoveryRate}%`}
-            progress={recoveryRate}
-          />
+            <MetricCard
+              title="Total Revenue Recovered"
+              value={`$${totalRecovered.toLocaleString('en-US', { minimumFractionDigits: 2 })}`}
+              subtitle={`${stats?.recoveredCount || 0} payments successfully captured`}
+              icon={DollarSign}
+              variant="success"
+              badge={`+${recoveryRate}%`}
+              progress={recoveryRate}
+            />
 
-          <MetricCard
-            title="Recovery Efficiency"
-            value={`${recoveryRate}%`}
-            subtitle={`Target benchmark: > 60%`}
-            icon={TrendingUp}
-            variant="brand"
-            badge={`${stats?.recoveredCount || 0} / ${stats?.totalCount || 30}`}
-            progress={recoveryRate}
-          />
+            <MetricCard
+              title="Recovery Efficiency"
+              value={`${recoveryRate}%`}
+              subtitle={`Target benchmark: > 60%`}
+              icon={TrendingUp}
+              variant="brand"
+              badge={`${stats?.recoveredCount || 0} / ${stats?.totalCount || 30}`}
+              progress={recoveryRate}
+            />
 
-          <MetricCard
-            title="Pending & Escalated"
-            value={`$${(totalPending + totalEscalated).toLocaleString('en-US', { minimumFractionDigits: 2 })}`}
-            subtitle={`${stats?.pendingCount || 0} retrying in 3d • ${stats?.escalatedCount || 0} escalated`}
-            icon={ShieldAlert}
-            variant="default"
-            badge={`${(stats?.pendingCount || 0) + (stats?.escalatedCount || 0)} cases`}
-          />
-        </div>
+            <MetricCard
+              title="Pending & Escalated"
+              value={`$${(totalPending + totalEscalated).toLocaleString('en-US', { minimumFractionDigits: 2 })}`}
+              subtitle={`${stats?.pendingCount || 0} retrying in 3d • ${stats?.escalatedCount || 0} escalated`}
+              icon={ShieldAlert}
+              variant="default"
+              badge={`${(stats?.pendingCount || 0) + (stats?.escalatedCount || 0)} cases`}
+            />
+          </div>
 
-        {/* Failure Breakdown & AI Policies */}
-        <div className="space-y-6">
-          <FailureChart
-            stats={stats}
-            selectedReason={selectedReason}
-            onSelectReason={setSelectedReason}
-          />
+          {/* Failure Breakdown */}
+          <div className="space-y-6">
+            <FailureChart
+              stats={stats}
+              selectedReason={selectedReason}
+              onSelectReason={setSelectedReason}
+            />
+          </div>
 
-          <AgentRulesBanner />
-        </div>
+          {/* Payments Data Table */}
+          <div className="space-y-4">
+            <PaymentTable
+              payments={payments}
+              stats={stats}
+              onExecuteAction={handleExecuteAction}
+              onSelectPayment={setActiveModalPayment}
+              onOpenCustomerView={setCustomerViewPayment}
+              selectedReason={selectedReason}
+              onSelectReason={setSelectedReason}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              onOpenAuditLog={() => setIsAuditLogOpen(true)}
+              processingMap={processingMap}
+              userRole={user?.role || 'Admin'}
+            />
+          </div>
 
-        {/* Payments Data Table */}
-        <div className="space-y-4">
-          <PaymentTable
-            payments={payments}
-            stats={stats}
-            onExecuteAction={handleExecuteAction}
-            onSelectPayment={setActiveModalPayment}
-            onOpenCustomerView={setCustomerViewPayment}
-            selectedReason={selectedReason}
-            onSelectReason={setSelectedReason}
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            onOpenAuditLog={() => setIsAuditLogOpen(true)}
-            processingMap={processingMap}
-            userRole={user?.role || 'Admin'}
-          />
-        </div>
+        </main>
 
-      </main>
+        {/* Clean Minimal Footer */}
+        <footer className="mt-auto border-t border-sand-300/80 bg-creme-50/70 py-6 text-xs text-sand-700 font-medium">
+          <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+            <div>
+              <span className="font-serif-luxury font-bold text-sm text-burgundy-950">Recover</span>
+              <span className="mx-2 text-sand-400">•</span>
+              <span className="text-sand-700">Autonomous Revenue Recovery for Payment Platforms</span>
+            </div>
+          </div>
+        </footer>
+
+      </div>
 
       {/* Payment Detail & Trace Modal */}
       {activeModalPayment && (
@@ -451,16 +481,6 @@ export default function App() {
         />
       )}
 
-      {/* Clean Minimal Footer */}
-      <footer className="mt-auto border-t border-sand-300/80 bg-creme-50/70 py-6 text-xs text-sand-700 font-medium">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
-          <div>
-            <span className="font-serif-luxury font-bold text-sm text-burgundy-950">Recover</span>
-            <span className="mx-2 text-sand-400">•</span>
-            <span className="text-sand-700">Autonomous Revenue Recovery for Payment Platforms</span>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

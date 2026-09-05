@@ -79,15 +79,6 @@ export default function FailureChart({ stats, selectedReason, onSelectReason }) 
             <p className="text-xs text-sand-700">Distribution of payment failures & autonomous recovery policies</p>
           </div>
         </div>
-
-        {selectedReason !== 'all' && (
-          <button
-            onClick={() => onSelectReason('all')}
-            className="text-xs text-burgundy-700 hover:text-burgundy-900 font-semibold underline self-start sm:self-auto transition-colors"
-          >
-            Clear filter ({REASON_METADATA[selectedReason]?.label})
-          </button>
-        )}
       </div>
 
       {/* Grid of Causes */}

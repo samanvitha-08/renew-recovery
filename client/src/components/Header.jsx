@@ -8,7 +8,8 @@ import {
   Lock,
   FileText,
   LogOut,
-  User
+  User,
+  Menu
 } from 'lucide-react';
 
 export default function Header({ 
@@ -19,7 +20,8 @@ export default function Header({
   onOpenAuditLog,
   onOpenProfile,
   user,
-  onLogout
+  onLogout,
+  onToggleMobileSidebar
 }) {
   const pendingCount = stats?.failedCount || 0;
   const isViewer = user?.role === 'Viewer';
@@ -29,8 +31,17 @@ export default function Header({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           
-          {/* Logo & Title */}
+          {/* Mobile menu trigger & Logo & Title */}
           <div className="flex items-center space-x-3.5">
+            {onToggleMobileSidebar && (
+              <button
+                onClick={onToggleMobileSidebar}
+                className="lg:hidden p-2 rounded-xl text-sand-700 hover:text-burgundy-950 hover:bg-sand-200/80 border border-sand-300/70"
+                title="Toggle sidebar menu"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
+            )}
             <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-burgundy-700 via-burgundy-600 to-dustypink-400 p-[1.5px] shadow-md shadow-burgundy-900/15 transition-transform hover:scale-105 duration-300">
               <div className="w-full h-full bg-creme-50 rounded-[14px] flex items-center justify-center">
                 <Bot className="w-6 h-6 text-burgundy-700" />
